@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mechanism</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script src="js/layout.js"></script>
+
+<script>
+document.getElementById("page-content").innerHTML = `
+<h1>Van der Waals Force Model</h1>
+
+<div class="card">
+    <p><strong>Mathematical Relation:</strong> F ∝ 1 / r⁶</p>
+    <p>Adjust intermolecular distance (r in nm):</p>
+
+    <input type="range" min="0.3" max="2" step="0.01" value="0.6" id="distanceSlider">
+    <p>Distance: <span id="distanceValue">0.6</span> nm</p>
+    <p>Relative Force: <span id="forceValue"></span></p>
+
+    <canvas id="vdwGraph" width="800" height="350"></canvas>
+</div>
+`;
+</script>
+
+<script src="js/vdw.js"></script>
+
+</body>
+</html>

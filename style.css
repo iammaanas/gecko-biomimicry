@@ -1,0 +1,173 @@
+:root {
+    --bg-main: #0a0f14;
+    --bg-layer: #0f1620;
+    --bg-card: #131c26;
+    --accent: #ffbd59;
+    --text-primary: #e6edf3;
+    --text-muted: #9aa4af;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* TOP BAR */
+.topbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    background: rgba(15,22,32,0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.left-section {
+    display: flex;
+    align-items: center;
+}
+
+.menu-btn {
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-right: 1.2rem;
+    color: var(--text-muted);
+    transition: 0.25s ease;
+}
+
+.menu-btn:hover {
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(255,189,89,0.6);
+}
+
+.brand {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+}
+
+/* NAVIGATION ARROWS (RIGHT SIDE) */
+.nav-controls {
+    display: flex;
+    gap: 1.5rem;
+    transition: 0.3s ease;
+}
+
+.nav-arrow {
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: 0.25s ease;
+}
+
+.nav-arrow:hover {
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(255,189,89,0.6);
+    transform: translateY(-1px);
+}
+
+/* Hide arrows when sidebar is open */
+.sidebar.active ~ .overlay ~ .main-wrapper .topbar .nav-controls {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100vh;
+    background: var(--bg-layer);
+    padding: 2.5rem 2rem;
+    transition: 0.4s ease;
+    z-index: 1000;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar h2 {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    color: var(--accent);
+}
+
+.nav-item {
+    display: block;
+    padding: 0.9rem 0.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    border-radius: 8px;
+    transition: 0.3s ease;
+    font-size: 1rem;
+}
+
+.nav-item:hover {
+    background: rgba(255,189,89,0.08);
+    color: var(--accent);
+}
+
+/* OVERLAY */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s ease;
+    z-index: 500;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* MAIN CONTENT WRAPPER */
+.main-wrapper {
+    position: relative;
+}
+
+.main-content {
+    padding: 4rem 2rem;
+    max-width: 900px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 2.5rem;
+}
+
+.card {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: 0.35s ease;
+}
+
+.card:hover {
+    border: 1px solid rgba(255, 189, 89, 0.65);
+    box-shadow:
+        0 0 25px rgba(255, 189, 89, 0.25),
+        0 0 60px rgba(255, 189, 89, 0.12);
+}
