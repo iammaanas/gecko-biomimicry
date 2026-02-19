@@ -4,26 +4,29 @@
 <meta charset="UTF-8">
 <title>Gecko Adhesion — Load Simulator</title>
 <link rel="stylesheet" href="css/style.css">
+
 <style>
 
-/* ---- Simulation Page Specific Styling ---- */
+/* =============================
+   Simulation Layout Styling
+   ============================= */
 
-.sim-container {
+.sim-wrapper {
     display: flex;
     gap: 40px;
     padding: 40px;
 }
 
 .sim-controls {
-    width: 380px;
-    background: rgba(15,25,35,0.9);
+    width: 400px;
+    background: rgba(15,25,35,0.95);
     padding: 30px;
-    border-radius: 14px;
+    border-radius: 16px;
     border: 1px solid rgba(255,189,89,0.15);
 }
 
 .sim-controls h2 {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #ffbd59;
 }
 
@@ -33,9 +36,9 @@
 
 .section label {
     display: block;
-    margin-bottom: 8px;
     font-size: 14px;
-    opacity: 0.8;
+    margin-bottom: 8px;
+    opacity: 0.85;
 }
 
 input[type="number"],
@@ -60,7 +63,7 @@ input[type="range"] {
 
 .preset-btn {
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 10px;
     background: transparent;
     border: 1px solid rgba(255,255,255,0.1);
     color: white;
@@ -82,8 +85,9 @@ input[type="range"] {
     margin-top: 25px;
     padding: 15px;
     background: rgba(0,0,0,0.3);
-    border-radius: 10px;
+    border-radius: 12px;
     font-family: monospace;
+    font-size: 14px;
 }
 
 .status-label {
@@ -93,15 +97,14 @@ input[type="range"] {
 
 .sim-visual {
     flex: 1;
-    background: rgba(10,18,25,0.8);
-    border-radius: 14px;
+    background: rgba(10,18,25,0.9);
+    border-radius: 16px;
     border: 1px solid rgba(255,189,89,0.15);
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.3);
-    font-size: 18px;
+    color: rgba(255,255,255,0.25);
+    font-size: 20px;
 }
 
 </style>
@@ -109,9 +112,9 @@ input[type="range"] {
 
 <body>
 
-<div class="sim-container">
+<div class="sim-wrapper">
 
-    <!-- LEFT PANEL -->
+    <!-- CONTROLS PANEL -->
     <div class="sim-controls">
 
         <h2>Gecko Adhesion — Load Simulator</h2>
@@ -140,19 +143,25 @@ input[type="range"] {
                 <option value="9.81">Earth — 9.81 m/s²</option>
                 <option value="3.71">Mars — 3.71 m/s²</option>
                 <option value="1.62">Moon — 1.62 m/s²</option>
-                <option value="0.1">ISS (Microgravity) — 0.1 m/s²</option>
+                <option value="0.1">ISS — 0.1 m/s²</option>
             </select>
         </div>
 
         <!-- Contact Area -->
         <div class="section">
-            <label>Contact area (cm²)</label>
+            <label>
+                Contact area (cm²): 
+                <span id="areaValue">10</span> cm²
+            </label>
             <input id="areaSlider" type="range" min="1" max="100" value="10">
         </div>
 
         <!-- Surface Efficiency -->
         <div class="section">
-            <label>Surface efficiency η (0–1)</label>
+            <label>
+                Surface efficiency η (0–1): 
+                <span id="efficiencyValue">0.90</span>
+            </label>
             <input id="efficiencySlider" type="range" min="0.1" max="1" step="0.05" value="0.9">
         </div>
 
@@ -166,9 +175,9 @@ input[type="range"] {
 
     </div>
 
-    <!-- RIGHT VISUAL AREA -->
+    <!-- VISUAL PANEL -->
     <div class="sim-visual">
-        Visualization Render Area
+        Simulation Render Area
     </div>
 
 </div>
