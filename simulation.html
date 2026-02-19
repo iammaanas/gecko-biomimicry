@@ -11,6 +11,13 @@
    Simulation Layout Styling
    ============================= */
 
+body {
+    margin: 0;
+    background: #0b141c;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
 .sim-wrapper {
     display: flex;
     gap: 40px;
@@ -97,14 +104,16 @@ input[type="range"] {
 
 .sim-visual {
     flex: 1;
-    background: rgba(10,18,25,0.9);
+    background: rgba(10,18,25,0.95);
     border-radius: 16px;
     border: 1px solid rgba(255,189,89,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.25);
-    font-size: 20px;
+    position: relative;
+}
+
+#simCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 </style>
@@ -177,7 +186,7 @@ input[type="range"] {
 
     <!-- VISUAL PANEL -->
     <div class="sim-visual">
-        Simulation Render Area
+        <canvas id="simCanvas"></canvas>
     </div>
 
 </div>
