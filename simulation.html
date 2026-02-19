@@ -6,158 +6,185 @@
 <title>Gecko Adhesion Simulator — Simulation</title>
 <style>
   :root{
-    --bg:#071018; --card:#0e161b; --muted:#98a3ad; --accent:#ffbd59;
-    --good:#38c172; --warn:#f6c85f; --bad:#ff6b6b; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+    --bg:#031018; --panel:#0e161b; --muted:#98a3ad; --accent:#ffbd59;
+    --good:#38c172; --warn:#f6c85f; --bad:#ff6b6b; --glass: rgba(255,255,255,0.02);
+    font-family:Inter,system-ui,Segoe UI,Roboto,Arial; -webkit-font-smoothing:antialiased;
   }
-  html,body{height:100%; margin:0; background:linear-gradient(180deg,#03060a 0%, #071018 100%); color:#d7e1e8}
-  .wrap{display:flex; gap:20px; padding:22px; box-sizing:border-box; max-width:1300px; margin:0 auto;}
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); flex:0 0 420px;}
-  .viz{flex:1; min-height:560px; border-radius:12px; overflow:hidden; position:relative; display:flex; gap:12px; align-items:stretch;}
-  h2{margin:2px 0 10px 0; font-weight:600}
-  label{color:var(--muted); font-size:13px}
-  .row{display:flex; gap:8px; align-items:center; margin:8px 0}
-  input[type=range]{width:100%}
-  .btns{display:flex; gap:8px; flex-wrap:wrap}
-  button{background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); padding:8px 12px; border-radius:8px; cursor:pointer}
-  button.primary{background:linear-gradient(90deg,var(--accent),#ff9e2e); color:#071018; border:none}
-  .small{font-size:13px; color:var(--muted)}
-  .readout{margin-top:12px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.02); font-family:monospace}
-  #canvas2d{background:linear-gradient(180deg,#081218,#071018); width:100%; height:100%; display:block}
-  .top-controls{display:flex; gap:8px; align-items:center; margin-bottom:8px}
-  .preset-btn{padding:6px 10px; border-radius:6px; font-size:13px}
-  .status{position:absolute; right:18px; top:18px; padding:8px 12px; background:rgba(0,0,0,0.45); border-radius:8px; color:#fff; font-weight:600}
-  .legend{display:flex; gap:8px; align-items:center; margin-top:10px}
-  .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
-  .controls-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px}
-  .footer-note{font-size:13px; color:var(--muted); margin-top:12px}
-  /* stress overlay */
-  .stress-overlay{position:absolute; inset:0; pointer-events:none}
-  .panel .title-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
-  .switch{display:inline-flex; align-items:center; gap:6px}
-  .small-input{width:100%; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit}
-  .inline{display:inline-flex; gap:8px; align-items:center}
+
+  html,body{height:100%; margin:0; background:
+    radial-gradient(1200px 400px at 10% 10%, rgba(255,189,89,0.03), transparent 6%),
+    linear-gradient(180deg,#021018 0%, #031018 100%); color:#d7e1e8;}
+
+  /* outer container */
+  .page { max-width:1400px; margin:18px auto; padding:12px; box-sizing:border-box; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;}
+  header h1{ margin:0; font-size:20px; color:#fff; font-weight:600; }
+  header p{ margin:0; color:var(--muted); font-size:13px; }
+
+  /* layout */
+  .wrap{ display:flex; gap:28px; align-items:flex-start; }
+  .controls-panel{
+    width:360px; min-width:300px; max-width:420px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    box-sizing:border-box; overflow:auto; max-height:calc(100vh - 60px);
+  }
+  .viz-panel { flex:1; min-height:640px; background:linear-gradient(180deg,#061018,#041018); border-radius:14px; position:relative; box-shadow:0 10px 40px rgba(0,0,0,0.6); padding:12px; display:flex; flex-direction:column; }
+
+  /* small header inside panel */
+  .panel-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
+  .panel-header h2{ margin:0; font-size:16px; }
+  .muted{ color:var(--muted); font-size:13px; }
+
+  /* control elements */
+  label{ color:var(--muted); font-size:13px; display:block; margin-bottom:6px; }
+  .row{ display:flex; gap:8px; align-items:center; margin:10px 0; }
+  .inline{ display:inline-flex; gap:8px; align-items:center; }
+  .small-input{ width:100%; padding:9px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit; font-size:13px; box-sizing:border-box; }
+  input[type=range]{ width:100%; }
+  .btns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  button{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; }
+  button.primary{ background:linear-gradient(90deg,var(--accent), #ff9e2e); color:#071018; border:none; box-shadow:0 6px 18px rgba(255,189,89,0.08); }
+  .readout{ margin-top:12px; padding:12px; border-radius:10px; background:var(--glass); font-family:monospace; font-size:13px; line-height:1.5; }
+  .legend{ margin-top:10px; display:flex; gap:10px; align-items:center; color:var(--muted); font-size:13px; }
+
+  /* viz */
+  #canvas2d{ width:100%; height:100%; display:block; border-radius:8px; background:linear-gradient(180deg,#071018,#031018); }
+  .status-badge{ position:absolute; right:18px; top:18px; padding:8px 12px; background:rgba(0,0,0,0.45); border-radius:8px; color:#fff; font-weight:700; z-index:40; }
+  .collapse-btn{ background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); padding:6px 8px; border-radius:8px; cursor:pointer; font-size:13px; }
+
+  /* small responsive */
+  @media (max-width:980px){
+    .wrap{ flex-direction:column; gap:14px; }
+    .controls-panel{ width:100%; max-height:none; }
+    .viz-panel{ min-height:520px; }
+  }
 </style>
 </head>
 <body>
-<div style="padding:18px; max-width:1300px; margin:0 auto;">
-  <h1 style="margin:6px 0 12px 0; color:#fff">Gecko Adhesion — Load Simulator</h1>
-  <div style="color:var(--muted); margin-bottom:8px">Interactive simulator: pick mass, gravity, area, adhesive stress and surface efficiency. Toggle stress overlay to show where tape stresses most.</div>
-</div>
-
-<div class="wrap">
-  <!-- Controls -->
-  <div class="panel" aria-label="controls">
-    <div class="title-row">
-      <h2 style="margin:0">Simulation Controls</h2>
-      <div class="small">Mode: <strong id="modeLabel">Semi-Advanced</strong></div>
-    </div>
-
+<div class="page">
+  <header>
     <div>
-      <label class="small">Weight presets</label>
-      <div class="btns" style="margin-top:8px;">
-        <button class="preset-btn" data-mass="0.18">Phone (0.18 kg)</button>
-        <button class="preset-btn" data-mass="2.0">Laptop (2 kg)</button>
-        <button class="preset-btn" data-mass="8.0">Backpack (8 kg)</button>
-        <button class="preset-btn primary" data-mass="70">Person (70 kg)</button>
+      <h1>Gecko Adhesion — Load Simulator</h1>
+      <p class="muted">Interactive simulator: mass, gravity, area, stress & efficiency. Toggle the stress overlay; collapse controls to focus on the visualization.</p>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button id="collapseControls" class="collapse-btn">Collapse Controls</button>
+      <div style="font-size:13px; color:var(--muted)">Accent: <strong style="color:var(--accent); margin-left:6px">#ffbd59</strong></div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- CONTROLS -->
+    <aside class="controls-panel" id="controlsPanel" aria-label="Simulation Controls">
+      <div class="panel-header">
+        <h2>Controls</h2>
+        <div class="muted" id="modeLabel">Mode: Semi-Advanced</div>
       </div>
 
-      <div class="row" style="margin-top:10px">
-        <label style="width:120px">Manual mass (kg)</label>
+      <label>Weight presets</label>
+      <div class="btns" id="presets">
+        <button data-mass="0.18">Phone — 0.18 kg</button>
+        <button data-mass="2.0">Laptop — 2 kg</button>
+        <button data-mass="8.0">Backpack — 8 kg</button>
+        <button class="primary" data-mass="70">Person — 70 kg</button>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <label style="width:122px;">Manual mass (kg)</label>
         <input id="massInput" class="small-input" type="number" step="0.01" min="0" value="2.00" />
       </div>
 
       <div class="row">
-        <label style="width:120px">Gravity preset</label>
+        <label style="width:122px;">Gravity preset</label>
         <select id="gravityPreset" class="small-input">
           <option value="9.81">Earth — 9.81 m/s²</option>
           <option value="1.62">Moon — 1.62 m/s²</option>
           <option value="3.71">Mars — 3.71 m/s²</option>
           <option value="24.79">Jupiter — 24.79 m/s²</option>
-          <option value="0.0001">ISS (microgravity) — 1e-4 m/s²</option>
+          <option value="0.0001">ISS — 1e-4 m/s² (microgravity)</option>
           <option value="custom">Custom...</option>
         </select>
       </div>
-      <div id="customGravityRow" style="display:none" class="row">
-        <label style="width:120px">Custom g (m/s²)</label>
+
+      <div class="row" id="customGravityRow" style="display:none">
+        <label style="width:122px;">Custom g (m/s²)</label>
         <input id="gravityInput" class="small-input" type="number" step="0.001" min="0" value="9.81" />
       </div>
 
+      <div style="height:8px"></div>
+
+      <label>Contact area</label>
       <div class="row">
-        <label style="width:120px">Contact area (cm²)</label>
         <input id="areaRange" type="range" min="1" max="200" value="10" />
-        <div style="width:60px; text-align:right" id="areaLabel">10 cm²</div>
+        <div style="width:84px; text-align:right;" id="areaLabel">10 cm²</div>
       </div>
 
+      <label>Adhesive stress σ (kPa)</label>
       <div class="row">
-        <label style="width:120px">Adhesive stress σ (kPa)</label>
         <input id="sigmaRange" type="range" min="50" max="1000" value="120" />
-        <div style="width:60px; text-align:right" id="sigmaLabel">120 kPa</div>
+        <div style="width:84px; text-align:right;" id="sigmaLabel">120 kPa</div>
       </div>
 
+      <label>Surface efficiency η</label>
       <div class="row">
-        <label style="width:120px">Surface efficiency η</label>
         <input id="etaRange" type="range" min="0.4" max="1.0" step="0.01" value="0.9" />
-        <div style="width:60px; text-align:right" id="etaLabel">0.90</div>
+        <div style="width:84px; text-align:right;" id="etaLabel">0.90</div>
       </div>
 
-      <div class="controls-grid">
-        <div>
-          <label class="small">View</label>
-          <div style="margin-top:6px;">
-            <button id="view2d" class="preset-btn primary">2D</button>
-            <button id="view3d" class="preset-btn">3D</button>
-          </div>
-        </div>
-        <div>
-          <label class="small">Stress overlay</label>
-          <div style="margin-top:6px;">
-            <label class="inline"><input id="stressToggle" type="checkbox" checked /> show stress</label>
-          </div>
-        </div>
+      <div style="height:6px"></div>
+
+      <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+        <button id="view2d" class="primary">2D View</button>
+        <button id="view3d" class="">3D View</button>
+        <label style="margin-left:8px;" class="inline"><input id="stressToggle" type="checkbox" checked /> <span class="muted">Stress overlay</span></label>
       </div>
 
-      <div class="readout" id="results">
+      <div class="readout" id="results" aria-live="polite">
         <div>Adhesive Force: <strong id="Fadh">—</strong> N</div>
         <div>Weight Force: <strong id="Fg">—</strong> N</div>
         <div>Safety Factor (SF): <strong id="SF">—</strong></div>
         <div>Status: <strong id="status" style="color:var(--muted)">—</strong></div>
       </div>
 
-      <div class="footer-note">Tip: increase contact area or adhesive stress to increase load capacity. ISS uses microgravity (useful for demonstration).</div>
-    </div>
-  </div>
+      <div class="legend">
+        <div style="display:flex; gap:8px; align-items:center">
+          <div style="width:12px;height:12px;background:var(--good);border-radius:3px"></div><div class="muted">Hold</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <div style="width:12px;height:12px;background:var(--warn);border-radius:3px"></div><div class="muted">Warning</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <div style="width:12px;height:12px;background:var(--bad);border-radius:3px"></div><div class="muted">Fail</div>
+        </div>
+      </div>
 
-  <!-- Visualization -->
-  <div class="viz">
-    <div id="statusBadge" class="status">Ready</div>
+      <div style="height:10px"></div>
+      <div class="muted">Tip: collapse controls to focus on the visualization. You can still expand anytime.</div>
+      <div style="height:24px"></div>
+    </aside>
 
-    <!-- 2D canvas -->
-    <canvas id="canvas2d"></canvas>
-    <div class="stress-overlay" id="stressOverlay" style="display:block; pointer-events:none"></div>
+    <!-- VISUALIZATION -->
+    <main class="viz-panel">
+      <div class="status-badge" id="statusBadge">Ready</div>
 
-    <!-- 3D container (hidden by default) -->
-    <div id="threeContainer" style="display:none; width:100%; height:100%;"></div>
+      <canvas id="canvas2d"></canvas>
+      <div id="threeContainer" style="display:none; width:100%; height:100%;"></div>
+      <!-- stress overlay is managed through canvas drawing -->
+    </main>
   </div>
 </div>
 
-<!-- CITATIONS PANEL (compact) -->
-<div style="max-width:1300px; margin:14px auto; color:var(--muted); font-size:13px;">
-  <strong>Sources used in simulation values</strong>
-  <ul>
-    <li>Autumn et al., Nature — single seta force measurements. <a href="https://www.nature.com/articles/35042564" target="_blank" rel="noopener">https://www.nature.com/articles/35042564</a></li>
-    <li>Sitti review (synthetic hierarchical adhesive values, ~80–110 kPa). <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11850978" target="_blank" rel="noopener">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11850978</a></li>
-    <li>Qu et al., Science — carbon nanotube adhesive (high shear values). <a href="https://www.science.org/doi/10.1126/science.1159503" target="_blank" rel="noopener">https://www.science.org/doi/10.1126/science.1159503</a></li>
-    <li>Hawkes et al., Royal Society Interface — human climbing demonstrations with gecko-inspired pads. <a href="https://royalsocietypublishing.org/doi/10.1098/rsif.2014.0695" target="_blank" rel="noopener">https://royalsocietypublishing.org/doi/10.1098/rsif.2014.0695</a></li>
-    <li>NASA gravity facts (Earth, Moon, Mars, Jupiter). <a href="https://nssdc.gsfc.nasa.gov/planetary/planets.html" target="_blank" rel="noopener">https://nssdc.gsfc.nasa.gov/planetary/planets.html</a></li>
-    <li>NASA ISS / microgravity description. <a href="https://www.nasa.gov/mission_pages/station/research/whyspace.html" target="_blank" rel="noopener">https://www.nasa.gov/mission_pages/station/research/whyspace.html</a></li>
-  </ul>
-</div>
+<!-- NOTE: CITATIONS REMOVED FROM PAGE BY REQUEST. CITATION LINKS PROVIDED BELOW IN CHAT (PRIVATE). -->
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
-/* ======= Simulation logic and UI glue ======= */
+/* ======= Simulation logic and UI glue (unchanged core) ======= */
 (() => {
   // DOM
+  const controlsPanel = document.getElementById('controlsPanel');
+  const collapseControlsBtn = document.getElementById('collapseControls');
   const massInput = document.getElementById('massInput');
   const gravityPreset = document.getElementById('gravityPreset');
   const gravityInput = document.getElementById('gravityInput');
@@ -172,19 +199,26 @@
   const FgEl = document.getElementById('Fg');
   const SFEl = document.getElementById('SF');
   const statusEl = document.getElementById('status');
-  const resultsEl = document.getElementById('results');
   const canvas2d = document.getElementById('canvas2d');
   const stressToggle = document.getElementById('stressToggle');
-  const stressOverlay = document.getElementById('stressOverlay');
   const view2dBtn = document.getElementById('view2d');
   const view3dBtn = document.getElementById('view3d');
   const threeContainer = document.getElementById('threeContainer');
   const statusBadge = document.getElementById('statusBadge');
-  const presetBtns = document.querySelectorAll('.preset-btn[data-mass]');
+  const presetBtns = document.querySelectorAll('[data-mass]');
   const modeLabel = document.getElementById('modeLabel');
 
+  // initial UI state
+  let controlsCollapsed = false;
+  collapseControlsBtn.addEventListener('click', ()=>{
+    controlsCollapsed = !controlsCollapsed;
+    controlsPanel.style.display = controlsCollapsed ? 'none' : 'block';
+    collapseControlsBtn.textContent = controlsCollapsed ? 'Show Controls' : 'Collapse Controls';
+    // resize canvas to use full width when collapsed
+    setTimeout(()=>{ onResize(); }, 60);
+  });
+
   // Defaults (physically grounded)
-  // σ default: 120 kPa = 120000 N/m^2 (based on Sitti review / synthetic adhesives)
   let sigma_kPa = Number(sigmaRange.value); // in kPa (UI)
   let sigma = sigma_kPa * 1000; // N/m^2
   let area_cm2 = Number(areaRange.value); // cm^2
@@ -193,21 +227,8 @@
   let mass = Number(massInput.value); // kg
   let g = Number(gravityPreset.value); // m/s^2
 
-  // canvas setup 2D
-  const ctx = canvas2d.getContext('2d');
-  function resizeCanvas(){
-    canvas2d.width = canvas2d.clientWidth = canvas2d.parentElement.clientWidth;
-    canvas2d.height = canvas2d.clientHeight = canvas2d.parentElement.clientHeight;
-    draw();
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  // 3D minimal setup variables (lazy init)
-  let threeState = { inited:false, scene:null, camera:null, renderer:null, cube:null, tapePlane:null, arrowMesh:null, animDrop:false };
-
-  // UI interactions
-  document.querySelectorAll('.preset-btn[data-mass]').forEach(b=>{
+  // preset mass buttons
+  document.querySelectorAll('[data-mass]').forEach(b=>{
     b.addEventListener('click', ()=> {
       massInput.value = b.dataset.mass;
       mass = Number(massInput.value);
@@ -247,7 +268,7 @@
     updateAll();
   });
 
-  stressToggle.addEventListener('change', ()=> { stressOverlay.style.display = stressToggle.checked ? 'block' : 'none'; draw(); });
+  stressToggle.addEventListener('change', ()=> { draw(); });
 
   view2dBtn.addEventListener('click', ()=>{
     threeContainer.style.display = 'none';
@@ -264,15 +285,26 @@
     drawThree();
   });
 
-  // default to 2D
-  view2dBtn.click();
+  // canvas setup 2D
+  const ctx = canvas2d.getContext('2d');
+  function onResize(){
+    // compute available width; if controls collapsed, use full page width
+    const parent = canvas2d.parentElement;
+    canvas2d.width = canvas2d.clientWidth = parent.clientWidth - 24;
+    canvas2d.height = canvas2d.clientHeight = parent.clientHeight - 24;
+    draw();
+    if (threeState.inited) {
+      threeState.renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
+      threeState.camera.aspect = threeContainer.clientWidth / threeContainer.clientHeight;
+      threeState.camera.updateProjectionMatrix();
+    }
+  }
+  window.addEventListener('resize', onResize);
+  // call after layout ready
+  setTimeout(onResize, 70);
 
-  // mode label (we keep semi-advanced)
-  modeLabel.textContent = 'Semi-Advanced';
-
-  // compute physics
+  // physics
   function computeForces(){
-    // Fadh = sigma * A * eta
     const Fadh = sigma * area_m2 * eta;
     const Fg = mass * g;
     const SF = (Fg > 0) ? (Fadh / Fg) : Infinity;
@@ -280,145 +312,122 @@
   }
 
   function updateAll(){
-    // recompute and update UI
     const {Fadh, Fg, SF} = computeForces();
     FadhEl.textContent = Fadh.toFixed(2);
     FgEl.textContent = Fg.toFixed(2);
     SFEl.textContent = (isFinite(SF) ? SF.toFixed(2) : '—');
-    // status
     let status = 'HOLD';
     let color = 'var(--good)';
     if (SF < 1) { status = 'FAIL'; color = 'var(--bad)'; } 
     else if (SF < 1.2) { status = 'WARNING'; color = 'var(--warn)'; }
     statusEl.textContent = status; statusEl.style.color = color;
     statusBadge.textContent = status;
-    statusBadge.style.background = (status==='HOLD') ? 'rgba(56,193,114,0.14)' : (status==='WARNING' ? 'rgba(246,200,95,0.14)' : 'rgba(255,107,107,0.12)');
-    // redraw visual
+    statusBadge.style.background = (status==='HOLD') ? 'rgba(56,193,114,0.12)' : (status==='WARNING' ? 'rgba(246,200,95,0.10)' : 'rgba(255,107,107,0.08)');
     draw();
     if (threeState.inited) updateThreeObjects(Fadh, Fg);
   }
 
-  // 2D draw
+  // 2D draw function (kept same logic, but uses roomier layout)
   function draw(){
     const w = canvas2d.width, h = canvas2d.height;
     ctx.clearRect(0,0,w,h);
-    // background
     const grad = ctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0,'#071018'); grad.addColorStop(1,'#03060a');
+    grad.addColorStop(0,'#071018'); grad.addColorStop(1,'#031018');
     ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
-    // wall (left)
-    const wallX = w*0.12, wallW = Math.max(40, w*0.05);
-    ctx.fillStyle = '#0b1220';
-    ctx.fillRect(wallX - wallW, h*0.12, wallW, h*0.76);
 
-    // tape patch center
-    const patchW = Math.min(240, w*0.16);
-    const patchH = Math.min(120, h*0.09);
-    const patchX = wallX + 6;
-    const patchY = h*0.37;
+    // wall
+    const wallX = Math.max(60, w*0.12), wallW = Math.max(44, w*0.06);
+    ctx.fillStyle = '#0b1220'; ctx.fillRect(wallX - wallW, h*0.12, wallW, h*0.76);
 
-    // tape stress overlay (heat) depends on stressFactor = Fg / (sigma*A)
+    // tape patch
+    const patchW = Math.min(340, w*0.18);
+    const patchH = Math.min(140, h*0.12);
+    const patchX = wallX + 12;
+    const patchY = h*0.28;
+
+    // compute forces
     const {Fadh, Fg, SF} = computeForces();
-    const stressFactor = (sigma*area_m2>0) ? (Fg / (sigma*area_m2 / 1.0)) : 0; // Fg / Fmax
-    const stressColor = stressFactor <= 0.8 ? 'rgba(56,193,114,0.22)' : (stressFactor <= 1.0 ? 'rgba(246,200,95,0.28)' : 'rgba(255,107,107,0.32)');
+    const stressFactor = (sigma*area_m2>0) ? (Fg / (sigma*area_m2)) : 0;
+    const stressColor = stressFactor <= 0.8 ? 'rgba(56,193,114,0.18)' : (stressFactor <= 1.0 ? 'rgba(246,200,95,0.24)' : 'rgba(255,107,107,0.28)');
 
-    // draw patch (tape)
+    // draw patch & grid
     ctx.save();
     ctx.translate(patchX, patchY);
-    ctx.fillStyle = '#11161b'; ctx.fillRect(0,0,patchW,patchH);
-    // decorative subtle grid showing contact area
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-    ctx.lineWidth = 1;
-    for(let x=4;x<patchW;x+=8){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,patchH); ctx.stroke(); }
-    for(let y=4;y<patchH;y+=8){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(patchW,y); ctx.stroke(); }
-    // stress overlay
+    ctx.fillStyle = '#0e1b22'; ctx.fillRect(0,0,patchW,patchH);
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
+    for(let x=6;x<patchW;x+=10){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,patchH); ctx.stroke(); }
+    for(let y=6;y<patchH;y+=10){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(patchW,y); ctx.stroke(); }
     if (stressToggle.checked){
       ctx.fillStyle = stressColor; ctx.fillRect(0,0,patchW,patchH);
-      // stress bar
-      ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(-8,patchH+6, patchW+16, 8);
-      ctx.fillStyle = stressFactor<=1 ? 'rgba(255,255,255,0.06)' : 'rgba(255,0,0,0.22)';
+      ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(-8,patchH+8, patchW+16, 8);
       const barWidth = Math.max(2, Math.min(patchW+16, (stressFactor/1.5)*(patchW+16)));
-      ctx.fillRect(-8,patchH+6, barWidth, 8);
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '12px monospace';
-      ctx.fillText('stress factor: ' + stressFactor.toFixed(2), 6, patchH+26);
+      ctx.fillStyle = stressFactor<=1 ? 'rgba(255,255,255,0.06)' : 'rgba(255,0,0,0.22)';
+      ctx.fillRect(-8,patchH+8, barWidth, 8);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '13px monospace';
+      ctx.fillText('stress factor: ' + stressFactor.toFixed(2), 6, patchH+30);
     }
     ctx.restore();
 
-    // hanging block — position relative to status (if fail, drop)
-    const blockW = Math.min(180, w*0.12), blockH = Math.min(120, h*0.12);
-    const blockX = patchX + patchW + 20;
-    // animate drop on fail (simple traction)
+    // object block
+    const blockW = Math.min(260, w*0.16), blockH = Math.min(160, h*0.14);
+    const blockX = patchX + patchW + 28;
     const fail = SF < 1;
     const t = Date.now()/1000;
-    const dropOffset = fail ? Math.min(h*0.4, (t % 1.5) * 200) : 0;
-    // draw rope
+    const dropOffset = fail ? Math.min(h*0.45, (t % 1.5) * 260) : 0;
     ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 2;
-    ctx.moveTo(patchX + patchW*0.5, patchY + patchH); ctx.lineTo(blockX + blockW*0.5, patchY + patchH + 20 + dropOffset); ctx.stroke();
+    ctx.moveTo(patchX + patchW*0.5, patchY + patchH); ctx.lineTo(blockX + blockW*0.5, patchY + patchH + 26 + dropOffset); ctx.stroke();
+    ctx.fillStyle = fail ? '#4b1012' : '#163242'; ctx.fillRect(blockX, patchY + patchH + 26 + dropOffset, blockW, blockH);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.strokeRect(blockX, patchY + patchH + 26 + dropOffset, blockW, blockH);
 
-    // draw block (representing object)
-    ctx.fillStyle = fail ? '#3b1111' : '#0e2030';
-    ctx.fillRect(blockX, patchY + patchH + 20 + dropOffset, blockW, blockH);
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.strokeRect(blockX, patchY + patchH + 20 + dropOffset, blockW, blockH);
-
-    // Force arrows & labels
-    ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = '13px monospace';
-    // weight arrow (down)
-    const arrowX = blockX + blockW + 18;
-    const arrowY = patchY + patchH + 20 + dropOffset + 8;
-    drawArrow(arrowX, arrowY, arrowX, arrowY + 80 * Math.min(1.8, mass/10 + g/10), '#ff6b6b');
-    ctx.fillText('Weight (Fg): ' + Fg.toFixed(1) + ' N', arrowX + 10, arrowY + 80 * Math.min(1.8, mass/10 + g/10) + 16);
-    // adhesion arrow (up) from tape
+    // arrows & labels
+    ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = '14px monospace';
+    const arrowX = blockX + blockW + 22;
+    const arrowY = patchY + patchH + 26 + dropOffset + 10;
+    drawArrow(arrowX, arrowY, arrowX, arrowY + 120 * Math.min(2.0, mass/10 + g/9.81), '#ff6b6b');
+    ctx.fillText('Weight (Fg): ' + Fg.toFixed(1) + ' N', arrowX + 12, arrowY + 120 * Math.min(2.0, mass/10 + g/9.81) + 18);
     const adhX = patchX + patchW*0.5;
-    const adhY = patchY + patchH + 6;
-    drawArrow(adhX, adhY + 80, adhX, adhY, '#38c172');
-    ctx.fillText('Adhesion (Fadh): ' + Fadh.toFixed(1) + ' N', adhX - 30, adhY - 6);
+    const adhY = patchY + patchH + 10;
+    drawArrow(adhX, adhY + 120, adhX, adhY, '#38c172');
+    ctx.fillText('Adhesion (Fadh): ' + Fadh.toFixed(1) + ' N', adhX - 38, adhY - 8);
 
     // safety factor badge
     ctx.fillStyle = SF < 1 ? '#ff6b6b' : (SF < 1.2 ? '#f6c85f' : '#38c172');
-    ctx.fillRect(w - 220, 18, 200, 36);
-    ctx.fillStyle = '#071018'; ctx.font='600 15px monospace';
-    ctx.fillText('SF: ' + (isFinite(SF) ? SF.toFixed(2) : '--'), w - 160, 43);
+    ctx.fillRect(w - 260, 18, 220, 40);
+    ctx.fillStyle = '#071018'; ctx.font='700 15px monospace';
+    ctx.fillText('SF: ' + (isFinite(SF) ? SF.toFixed(2) : '--'), w - 190, 44);
 
-    // small helper draw functions
     function drawArrow(x1,y1,x2,y2,color){
       const dx = x2-x1, dy = y2-y1;
-      const len = Math.sqrt(dx*dx + dy*dy);
       ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      // head
-      const h = 8; const ang = Math.atan2(dy,dx);
+      const h = 9; const ang = Math.atan2(dy,dx);
       ctx.beginPath();
       ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - h*Math.cos(ang - 0.4), y2 - h*Math.sin(ang - 0.4));
-      ctx.lineTo(x2 - h*Math.cos(ang + 0.4), y2 - h*Math.sin(ang + 0.4));
+      ctx.lineTo(x2 - h*Math.cos(ang - 0.45), y2 - h*Math.sin(ang - 0.45));
+      ctx.lineTo(x2 - h*Math.cos(ang + 0.45), y2 - h*Math.sin(ang + 0.45));
       ctx.closePath(); ctx.fill();
     }
   }
 
-  // Three.js simple 3D fallback
+  // Three.js minimal 3D (same functionality)
+  let threeState = { inited:false, scene:null, camera:null, renderer:null, cube:null, tape:null, anim:false };
   function initThree(){
     const W = threeContainer.clientWidth, H = threeContainer.clientHeight;
-    const scene = new THREE.Scene(); scene.background = new THREE.Color(0x071018);
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0x041018);
     const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
     renderer.setSize(W,H); threeContainer.appendChild(renderer.domElement);
-    const camera = new THREE.PerspectiveCamera(40, W/H, 0.1, 1000); camera.position.set(0,12,26);
+    const camera = new THREE.PerspectiveCamera(45, W/H, 0.1, 1000); camera.position.set(0,10,28);
     const light = new THREE.DirectionalLight(0xfff7e8, 1.0); light.position.set(40,60,40); scene.add(light);
     scene.add(new THREE.AmbientLight(0xffffff,0.4));
-    // wall plane
     const wall = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0x09121a, roughness:0.95}));
     wall.rotation.y = Math.PI/2; wall.position.x = -12; scene.add(wall);
-    // tape plane (small)
-    const tapeMat = new THREE.MeshStandardMaterial({ color:0x09212a, roughness:0.6 });
-    const tape = new THREE.Mesh(new THREE.PlaneGeometry(6,3), tapeMat); tape.position.set(-6.5,5,0.9); tape.rotation.y = -0.05; scene.add(tape);
-    // hanging cube
+    const tape = new THREE.Mesh(new THREE.PlaneGeometry(6,3), new THREE.MeshStandardMaterial({ color:0x072227, roughness:0.6 }));
+    tape.position.set(-6.5,5,0.9); tape.rotation.y = -0.05; scene.add(tape);
     const cubeGeo = new THREE.BoxGeometry(4,3,2.5);
     const cubeMat = new THREE.MeshStandardMaterial({ color:0x253241, roughness:0.6 });
     const cube = new THREE.Mesh(cubeGeo, cubeMat); cube.position.set(-1,2.4,0); scene.add(cube);
 
-    // arrow helper for weight
-    const arrowMat = new THREE.MeshBasicMaterial({ color:0xff6b6b });
-    // store state
-    threeState = { inited:true, scene, camera, renderer, cube, tape, arrowMat, animDrop:false };
+    threeState = { inited:true, scene, camera, renderer, cube, tape };
     window.addEventListener('resize', ()=> {
       threeState.renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
       threeState.camera.aspect = threeContainer.clientWidth/threeContainer.clientHeight;
@@ -426,18 +435,12 @@
     });
     animateThree();
   }
-
   function updateThreeObjects(Fadh, Fg){
     if (!threeState.inited) return;
-    // color cube if failing
     const fail = Fadh < Fg;
     threeState.cube.material.color.set(fail ? 0x7b2a2a : 0x253241);
-    // if fail animate downward slowly
     if (fail) threeState.cube.position.y = Math.max(-8, threeState.cube.position.y - 0.06);
-    else {
-      // reset to hanging pos
-      threeState.cube.position.y += (2.4 - threeState.cube.position.y) * 0.08;
-    }
+    else threeState.cube.position.y += (2.4 - threeState.cube.position.y) * 0.08;
   }
   function animateThree(){
     if (!threeState.inited) return;
@@ -446,16 +449,16 @@
   }
   function drawThree(){ if (!threeState.inited) initThree(); }
 
-  // initial update
+  // initial update & resize
   updateAll();
-
-  // small live tick (to animate drop in 2D)
   setInterval(()=>{ draw(); }, 60);
+  function onResize(){ onResizeDebounced(); }
+  let onResizeDebounced = debounce(()=>{ onResize(); }, 80);
+  function onResize(){ const parent = canvas2d.parentElement; canvas2d.width = canvas2d.clientWidth = parent.clientWidth - 24; canvas2d.height = canvas2d.clientHeight = parent.clientHeight - 24; draw(); if (threeState.inited) { threeState.renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight); threeState.camera.aspect = threeContainer.clientWidth/threeContainer.clientHeight; threeState.camera.updateProjectionMatrix(); } }
+  function debounce(fn, t){ let id; return (...a)=>{ clearTimeout(id); id = setTimeout(()=>fn(...a), t); }; }
 
-  // Expose for debugging
+  // expose compute
   window.simulator = { computeForces, updateAll };
-
-  // initial draw call done
 })();
 </script>
 </body>
