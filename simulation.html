@@ -1,184 +1,179 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gecko Adhesion — Simulation</title>
+<meta charset="UTF-8">
+<title>Gecko Adhesion — Load Simulator</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
 
-  <!-- preserve your global CSS link (keeps the site theme) -->
-  <link rel="stylesheet" href="css/style.css">
+/* ---- Simulation Page Specific Styling ---- */
 
-  <!-- Scoped styles for the simulation module (won't override global styles) -->
-  <style>
-  /* scoped under #sim-root so it won't affect other pages */
-  #sim-root { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; color: #d7e1e8; }
+.sim-container {
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+}
 
-  /* page layout */
-  #sim-root .page {
-    max-width: 1400px;
-    margin: 18px auto;
-    padding: 12px;
-  }
+.sim-controls {
+    width: 380px;
+    background: rgba(15,25,35,0.9);
+    padding: 30px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,189,89,0.15);
+}
 
-  /* top header */
-  #sim-root header {
-    display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;
-  }
-  #sim-root header h1 { margin:0; font-size:20px; color:#fff; font-weight:700 }
-  #sim-root header p { margin:0; color:#9aa6b1; font-size:13px }
+.sim-controls h2 {
+    margin-bottom: 20px;
+    color: #ffbd59;
+}
 
-  /* main split: controls (left) + viz (right) */
-  #sim-root .wrap { display:flex; gap:28px; align-items:flex-start; }
-  #sim-root .controls-panel {
-    width:360px; min-width:300px; max-width:420px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:14px; padding:14px; box-sizing:border-box;
-    overflow:auto; max-height: calc(100vh - 100px);
-    border: 1px solid rgba(255,255,255,0.02);
-  }
-  #sim-root .viz-panel {
-    flex:1; min-height:640px;
-    background: linear-gradient(180deg,#061018,#041018);
-    border-radius:14px; position:relative; padding:18px; box-shadow:0 8px 36px rgba(0,0,0,0.5);
-    display:flex; flex-direction:column;
-  }
+.section {
+    margin-bottom: 25px;
+}
 
-  /* controls content */
-  #sim-root .panel-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
-  #sim-root .panel-header h2 { margin:0; font-size:16px; color:#ffbd59 }
-  #sim-root label { color:#98a3ad; font-size:13px; display:block; margin:10px 0 6px; }
-  #sim-root input[type="number"], #sim-root select { width:100%; padding:9px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit; font-size:13px; box-sizing:border-box; }
-  #sim-root input[type="range"] { width:100%; }
+.section label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    opacity: 0.8;
+}
 
-  #sim-root .btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-  #sim-root button { background:transparent; border:1px solid rgba(255,255,255,0.06); color:#cbd6dd; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; }
-  #sim-root button.primary { background: linear-gradient(90deg,#ffbd59,#ff9d2e); color:#071018; border:none; box-shadow:0 6px 18px rgba(255,189,89,0.08); }
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    background: #0f1a22;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: white;
+}
 
-  #sim-root .readout { margin-top:12px; padding:12px; border-radius:10px; background: rgba(255,255,255,0.02); font-family: monospace; font-size:13px; color:#dbe9f0; }
-  #sim-root .legend { margin-top:10px; display:flex; gap:10px; align-items:center; color:#9aa6b1; font-size:13px; }
+input[type="range"] {
+    width: 100%;
+}
 
-  /* viz subpanels: 3D area (top) and schematic (bottom) */
-  #sim-root .viz-main { display:flex; flex-direction:column; gap:12px; flex:1; }
-  #sim-root .three-area { height:55%; border-radius:10px; overflow:hidden; position:relative; background:linear-gradient(180deg,#041018,#031018); border: 1px solid rgba(255,255,255,0.02); }
-  #sim-root .schematic-area { height:40%; border-radius:10px; overflow:hidden; position:relative; background: linear-gradient(180deg,#061a20,#041018); padding:12px; border: 1px solid rgba(255,255,255,0.02); }
+.preset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
 
-  /* status badge top-right */
-  #sim-root .status-badge { position:absolute; right:18px; top:18px; padding:8px 12px; background: rgba(0,0,0,0.45); border-radius:8px; color:#fff; font-weight:700; z-index:40; display:flex; gap:8px; align-items:center; }
+.preset-btn {
+    padding: 10px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
-  /* schematic canvas full-size */
-  #sim-root #schematicCanvas { width:100%; height:100%; display:block; border-radius:8px; background:transparent; }
+.preset-btn:hover {
+    border-color: #ffbd59;
+}
 
-  /* responsive */
-  @media (max-width:980px){
-    #sim-root .wrap { flex-direction:column; gap:14px; }
-    #sim-root .controls-panel { width:100%; max-height:none; }
-    #sim-root .three-area { height:420px; }
-    #sim-root .schematic-area { height:260px; }
-  }
-  </style>
+.preset-btn.active {
+    background: #ffbd59;
+    color: black;
+    font-weight: bold;
+}
+
+.results-box {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    font-family: monospace;
+}
+
+.status-label {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.sim-visual {
+    flex: 1;
+    background: rgba(10,18,25,0.8);
+    border-radius: 14px;
+    border: 1px solid rgba(255,189,89,0.15);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 18px;
+}
+
+</style>
 </head>
+
 <body>
-  <div id="sim-root">
-    <div class="page">
-      <header>
-        <div>
-          <h1>Gecko Adhesion — Load Simulator</h1>
-          <p class="muted">Interactive: mass, gravity, contact-area, stress & efficiency. Use the schematic to see pressure and contact forming.</p>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <button id="collapseControls" class="primary" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:#cbd6dd;padding:8px 12px;border-radius:8px;">Collapse Controls</button>
-          <div style="color:#9aa6b1;font-size:13px">Accent: <strong style="color:#ffbd59;margin-left:6px">#ffbd59</strong></div>
-        </div>
-      </header>
 
-      <div class="wrap">
-        <!-- CONTROLS -->
-        <aside class="controls-panel" id="controlsPanel" aria-label="Simulation Controls">
-          <div class="panel-header">
-            <h2>Controls</h2>
-            <div class="muted" id="modeLabel">Mode: Semi-Advanced</div>
-          </div>
+<div class="sim-container">
 
-          <label>Weight presets</label>
-          <div class="btns" id="presets">
-            <button data-mass="0.18">Phone — 0.18 kg</button>
-            <button data-mass="2.0">Laptop — 2 kg</button>
-            <button data-mass="8.0">Backpack — 8 kg</button>
-            <button class="primary" data-mass="70">Person — 70 kg</button>
-          </div>
+    <!-- LEFT PANEL -->
+    <div class="sim-controls">
 
-          <label>Manual mass (kg)</label>
-          <input id="massInput" type="number" value="8.0" step="0.01" min="0">
+        <h2>Gecko Adhesion — Load Simulator</h2>
 
-          <label>Gravity preset</label>
-          <select id="gravityPreset">
-            <option value="9.81">Earth — 9.81 m/s²</option>
-            <option value="1.62">Moon — 1.62 m/s²</option>
-            <option value="3.71">Mars — 3.71 m/s²</option>
-            <option value="0.0001">ISS — microgravity</option>
-            <option value="custom">Custom...</option>
-          </select>
-
-          <div id="customGravityRow" style="display:none;margin-top:10px">
-            <label>Custom g (m/s²)</label>
-            <input id="gravityInput" type="number" step="0.001" min="0" value="9.81" />
-          </div>
-
-          <label>Contact area (cm²)</label>
-          <input id="areaInput" type="number" value="10" step="1" min="0.1">
-
-          <label>Adhesive stress σ (kPa)</label>
-          <input id="sigmaInput" type="number" value="120" step="1" min="0">
-
-          <label>Surface efficiency η (0–1)</label>
-          <input id="etaInput" type="range" min="0.1" max="1.0" step="0.01" value="0.90">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="color:#98a3ad;font-size:13px">Efficiency</div><div id="etaLabel" style="font-family:monospace">0.90</div>
-          </div>
-
-          <label style="margin-top:16px">Contact gap (mm) — press to form contact</label>
-          <input id="gapInput" type="range" min="0" max="1" step="0.01" value="1">
-
-          <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
-            <button id="playBtn" class="primary">Play Press</button>
-            <button id="snapBtn">Snap to Contact</button>
-            <label style="margin-left:8px"><input id="showNumbers" type="checkbox" checked/> Show pressure numbers</label>
-          </div>
-
-          <div class="readout" id="results" aria-live="polite">
-            Adhesive Force: <strong id="Fadh">—</strong> N<br>
-            Weight Force: <strong id="Fg">—</strong> N<br>
-            Pressure: <strong id="P">—</strong> kPa<br>
-            Safety Factor (SF): <strong id="SF">—</strong><br>
-            Status: <strong id="status" style="color:#9aa6b1">—</strong>
-          </div>
-
-          <div class="legend">
-            <div style="display:flex; gap:8px; align-items:center"><div style="width:12px;height:12px;background:#38c172;border-radius:3px"></div><div style="color:#9aa6b1">Hold</div></div>
-            <div style="display:flex; gap:8px; align-items:center"><div style="width:12px;height:12px;background:#f6c85f;border-radius:3px"></div><div style="color:#9aa6b1">Warning</div></div>
-            <div style="display:flex; gap:8px; align-items:center"><div style="width:12px;height:12px;background:#ff6b6b;border-radius:3px"></div><div style="color:#9aa6b1">Fail</div></div>
-          </div>
-        </aside>
-
-        <!-- VISUALIZATION -->
-        <main class="viz-panel">
-          <div class="status-badge" id="statusBadge">Ready</div>
-
-          <div class="viz-main">
-            <div class="three-area" id="threeArea" aria-hidden="false"></div>
-
-            <div class="schematic-area">
-              <canvas id="schematicCanvas"></canvas>
-              <!-- overlay controls or legends could go here -->
+        <!-- Weight Presets -->
+        <div class="section">
+            <label>Weight presets</label>
+            <div class="preset-grid">
+                <button class="preset-btn" data-mass="0.18">Phone — 0.18 kg</button>
+                <button class="preset-btn" data-mass="2">Laptop — 2 kg</button>
+                <button class="preset-btn active" data-mass="8">Backpack — 8 kg</button>
+                <button class="preset-btn" data-mass="70">Person — 70 kg</button>
             </div>
-          </div>
+        </div>
 
-        </main>
-      </div>
+        <!-- Manual Mass -->
+        <div class="section">
+            <label>Manual mass (kg)</label>
+            <input id="massInput" type="number" value="8" min="0.01" step="0.1">
+        </div>
+
+        <!-- Gravity -->
+        <div class="section">
+            <label>Gravity preset</label>
+            <select id="gravitySelect">
+                <option value="9.81">Earth — 9.81 m/s²</option>
+                <option value="3.71">Mars — 3.71 m/s²</option>
+                <option value="1.62">Moon — 1.62 m/s²</option>
+                <option value="0.1">ISS (Microgravity) — 0.1 m/s²</option>
+            </select>
+        </div>
+
+        <!-- Contact Area -->
+        <div class="section">
+            <label>Contact area (cm²)</label>
+            <input id="areaSlider" type="range" min="1" max="100" value="10">
+        </div>
+
+        <!-- Surface Efficiency -->
+        <div class="section">
+            <label>Surface efficiency η (0–1)</label>
+            <input id="efficiencySlider" type="range" min="0.1" max="1" step="0.05" value="0.9">
+        </div>
+
+        <!-- Results -->
+        <div class="results-box">
+            Adhesive Force: <span id="adhesiveForce">--</span><br>
+            Weight Force: <span id="weightForce">--</span><br>
+            Safety Factor: <span id="safetyFactor">--</span><br>
+            Status: <span id="statusLabel" class="status-label">--</span>
+        </div>
+
     </div>
-  </div>
 
-  <!-- We will load the module script below that contains all simulation logic -->
-  <script type="module" src="js/simulation.js"></script>
+    <!-- RIGHT VISUAL AREA -->
+    <div class="sim-visual">
+        Visualization Render Area
+    </div>
+
+</div>
+
+<script src="js/simulation.js"></script>
+
 </body>
 </html>
