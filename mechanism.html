@@ -1,27 +1,212 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Mechanism</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .main-content.mechanism-page {
+            max-width: 1200px;
+            padding-top: 5rem;
+        }
+
+        .mech-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 430px) minmax(420px, 1fr);
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .mech-panel,
+        .mech-canvas-card,
+        .mech-notes {
+            background: linear-gradient(145deg, #131c26, #111820);
+            border: 1px solid rgba(255, 189, 89, 0.16);
+            border-radius: 16px;
+            padding: 1.2rem;
+        }
+
+        .mech-panel h2,
+        .mech-canvas-card h2,
+        .mech-notes h2 {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .mech-intro {
+            margin-bottom: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .control {
+            margin-bottom: 1rem;
+        }
+
+        .control label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.45rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px;
+            padding: 0.65rem;
+            background: rgba(0,0,0,0.22);
+        }
+
+        .metric .name {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .metric .value {
+            color: #e9f2ff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        #vdwGraph {
+            width: 100%;
+            height: 420px;
+            border-radius: 12px;
+            display: block;
+            background: linear-gradient(180deg, #0f1a24, #0c141d);
+            margin-top: 0.7rem;
+        }
+
+        .equation {
+            margin-top: 0.8rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            color: #dce8f8;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem;
+            font-size: 0.88rem;
+        }
+
+        .mech-notes ul {
+            margin-left: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.93rem;
+        }
+
+        .status-chip {
+            display: inline-block;
+            margin-top: 0.7rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            border: 1px solid transparent;
+        }
+
+        @media (max-width: 1040px) {
+            .mech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #vdwGraph {
+                height: 360px;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <script src="js/layout.js"></script>
 
 <script>
+document.querySelector(".main-content").classList.add("mechanism-page");
 document.getElementById("page-content").innerHTML = `
-<h1>Van der Waals Force Model</h1>
+    <h1>How Gecko Tape Adhesion Works</h1>
 
-<div class="card">
-    <p><strong>Mathematical Relation:</strong> F ∝ 1 / r⁶</p>
-    <p>Adjust intermolecular distance (r in nm):</p>
+    <p class="mech-intro">
+        Gecko-inspired tape sticks through millions of micro-contacts. Each tiny contact contributes weak
+        van der Waals attraction, but together they sum into a strong adhesive hold. Explore how intermolecular
+        distance and effective contact quality change the final grip.
+    </p>
 
-    <input type="range" min="0.3" max="2" step="0.01" value="0.6" id="distanceSlider">
-    <p>Distance: <span id="distanceValue">0.6</span> nm</p>
-    <p>Relative Force: <span id="forceValue"></span></p>
+    <div class="mech-grid">
+        <div class="mech-panel">
+            <h2>Interactive Controls</h2>
 
-    <canvas id="vdwGraph" width="800" height="350"></canvas>
-</div>
+            <div class="control">
+                <label for="distanceSlider">
+                    Intermolecular distance r: <strong><span id="distanceValue">0.60</span> nm</strong>
+                </label>
+                <input type="range" min="0.30" max="2.00" step="0.01" value="0.60" id="distanceSlider">
+            </div>
+
+            <div class="control">
+                <label for="contactSlider">
+                    Effective micro-contact quality: <strong><span id="contactValue">75</span>%</strong>
+                </label>
+                <input type="range" min="10" max="100" step="1" value="75" id="contactSlider">
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric">
+                    <span class="name">Relative Force (1/r⁶)</span>
+                    <span class="value" id="forceValue">--</span>
+                </div>
+                <div class="metric">
+                    <span class="name">Normalized Adhesion Index</span>
+                    <span class="value" id="adhesionIndex">--</span>
+                </div>
+                <div class="metric">
+                    <span class="name">Contact Spots Engaged</span>
+                    <span class="value" id="contactSpots">--</span>
+                </div>
+                <div class="metric">
+                    <span class="name">Mode</span>
+                    <span class="value" id="modeLabel">--</span>
+                </div>
+            </div>
+
+            <div class="equation">
+                F<sub>vdW</sub> ∝ (1 / r<sup>6</sup>) × η<sub>contact</sub>
+            </div>
+            <span id="statusChip" class="status-chip">--</span>
+        </div>
+
+        <div class="mech-canvas-card">
+            <h2>Force Landscape + Micro-Contact Sketch</h2>
+            <canvas id="vdwGraph"></canvas>
+        </div>
+    </div>
+
+    <div class="mech-notes" style="margin-top: 1.4rem;">
+        <h2>What this means in practice</h2>
+        <ul>
+            <li><strong>Distance is everything:</strong> the attraction drops extremely fast as molecules separate.</li>
+            <li><strong>Surface conformity matters:</strong> more real contact area means more active setae and stronger hold.</li>
+            <li><strong>Dry adhesion is scalable:</strong> many weak nanoscale forces combine into a robust macroscale grip.</li>
+            <li><strong>Contamination/roughness reduces η:</strong> fewer contact points are activated, lowering total adhesion.</li>
+        </ul>
+    </div>
 `;
 </script>
 
