@@ -1,38 +1,20 @@
 // Detect current page
 const currentPage = window.location.pathname.split("/").pop() || "index.html";
+const isHome = currentPage === "index.html" || currentPage === "";
 
-// Layout template
+// Layout template — no sidebar, clean topbar with back button on inner pages
 const layout = `
 <div class="main-wrapper">
 
     <div class="topbar">
         <div class="left-section">
-            <div class="menu-btn" onclick="toggleMenu()">☰</div>
-            <div class="brand">Gecko Lab</div>
+            ${!isHome ? `<div class="back-btn" onclick="history.back()">←</div>` : ""}
+            <a class="brand" href="index.html">Gecko Lab</a>
         </div>
-
-        <div class="nav-controls">
-            <div class="nav-arrow" onclick="history.back()">←</div>
-            <div class="nav-arrow" onclick="history.forward()">→</div>
-        </div>
+        ${!isHome ? `
+        <div class="breadcrumb">${pageName(currentPage)}</div>
+        ` : ""}
     </div>
-
-    <div class="sidebar" id="sidebar">
-        <h2>Gecko Lab</h2>
-
-        <a class="nav-item ${currentPage === "index.html" ? "active" : ""}" href="index.html">Home</a>
-        <a class="nav-item ${currentPage === "research.html" ? "active" : ""}" href="research.html">Research</a>
-        <a class="nav-item ${currentPage === "mechanism.html" ? "active" : ""}" href="mechanism.html">Mechanism</a>
-        <a class="nav-item ${currentPage === "simulation.html" ? "active" : ""}" href="simulation.html">Simulation</a>
-        <a class="nav-item ${currentPage === "setae.html" ? "active" : ""}" href="setae.html">Setae Model</a>
-        <a class="nav-item ${currentPage === "applications.html" ? "active" : ""}" href="applications.html">Applications</a>
-        <a class="nav-item ${currentPage === "timeline.html" ? "active" : ""}" href="timeline.html">Timeline</a>
-        <a class="nav-item ${currentPage === "future.html" ? "active" : ""}" href="future.html">Future Potential</a>
-        <a class="nav-item ${currentPage === "presentation.html" ? "active" : ""}" href="presentation.html">Presentation</a>
-        <a class="nav-item ${currentPage === "about.html" ? "active" : ""}" href="about.html">About</a>
-    </div>
-
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <div class="main-content">
         <div id="page-content"></div>
@@ -41,13 +23,20 @@ const layout = `
 </div>
 `;
 
+function pageName(page) {
+    const names = {
+        "research.html": "Research Papers",
+        "mechanism.html": "Mechanism",
+        "simulation.html": "Simulation",
+        "setae.html": "Setae Model",
+        "applications.html": "Applications",
+        "timeline.html": "Timeline",
+        "future.html": "Future Potential",
+        "presentation.html": "Presentation",
+        "about.html": "About"
+    };
+    return names[page] || "";
+}
+
 // Inject layout
 document.body.innerHTML = layout;
-
-// Sidebar toggle
-function toggleMenu() {
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-    sidebar.classList.toggle("active");
-    overlay.classList.toggle("active");
-}
