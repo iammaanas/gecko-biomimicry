@@ -13,12 +13,15 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    background:
-        linear-gradient(180deg, #0a0f14 0%, #0c1219 100%);
-
+    background: linear-gradient(180deg, #0a0f14 0%, #0c1219 100%);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
@@ -29,164 +32,86 @@ body::before {
     content: "";
     position: fixed;
     inset: 0;
-
     background-image:
-        repeating-linear-gradient(
-            60deg,
-            rgba(255,189,89,0.06) 0px,
-            rgba(255,189,89,0.06) 1px,
-            transparent 1px,
-            transparent 40px
-        ),
-        repeating-linear-gradient(
-            -60deg,
-            rgba(255,189,89,0.06) 0px,
-            rgba(255,189,89,0.06) 1px,
-            transparent 1px,
-            transparent 40px
-        );
-
+        repeating-linear-gradient(60deg, rgba(255,189,89,0.04) 0px, rgba(255,189,89,0.04) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(-60deg, rgba(255,189,89,0.04) 0px, rgba(255,189,89,0.04) 1px, transparent 1px, transparent 40px);
     pointer-events: none;
     z-index: 0;
 }
 
-
-
 /* ================= TOP BAR ================= */
 
 .topbar {
-    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 54px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2.2rem;
-    background: rgba(15,22,32,0.88);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 0 1.4rem;
+    background: rgba(10,15,20,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .left-section {
     display: flex;
     align-items: center;
+    gap: 0.8rem;
 }
 
-.menu-btn {
-    font-size: 1.3rem;
+.back-btn {
+    font-size: 1.2rem;
     cursor: pointer;
-    margin-right: 1.3rem;
     color: var(--text-muted);
-    transition: 0.25s ease;
+    transition: 0.2s ease;
+    padding: 0.3rem 0.5rem;
+    border-radius: 8px;
+    user-select: none;
 }
 
-.menu-btn:hover {
+.back-btn:hover {
     color: var(--accent);
-    text-shadow: 0 0 10px rgba(255,189,89,0.6);
+    background: var(--accent-soft);
 }
 
 .brand {
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: 0.6px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     color: var(--accent);
-}
-
-/* NAV ARROWS */
-
-.nav-controls {
-    display: flex;
-    gap: 1.6rem;
-}
-
-.nav-arrow {
-    font-size: 1.15rem;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: 0.25s ease;
-}
-
-.nav-arrow:hover {
-    color: var(--accent);
-    text-shadow: 0 0 10px rgba(255,189,89,0.7);
-    transform: translateY(-1px);
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    width: 260px;
-    height: 100vh;
-    background: linear-gradient(180deg, #0f1620 0%, #0c1219 100%);
-    padding: 2.6rem 2rem;
-    transition: 0.4s ease;
-    z-index: 1000;
-    border-right: 1px solid rgba(255,255,255,0.05);
-}
-
-.sidebar.active {
-    left: 0;
-}
-
-.sidebar h2 {
-    font-size: 1.35rem;
-    margin-bottom: 2.2rem;
-    color: var(--accent);
-}
-
-.nav-item {
-    display: block;
-    padding: 0.85rem 0.6rem;
     text-decoration: none;
+}
+
+.breadcrumb {
+    font-size: 0.8rem;
     color: var(--text-muted);
-    border-radius: 10px;
-    transition: 0.3s ease;
-    font-size: 0.98rem;
-}
-
-.nav-item:hover {
-    background: var(--accent-soft);
-    color: var(--accent);
-}
-
-/* Active nav */
-.nav-item.active {
-    background: var(--accent-soft);
-    color: var(--accent);
-}
-
-/* ================= OVERLAY ================= */
-
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(3px);
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s ease;
-    z-index: 500;
-}
-
-.overlay.active {
-    opacity: 1;
-    visibility: visible;
+    letter-spacing: 0.04em;
 }
 
 /* ================= MAIN CONTENT ================= */
 
+.main-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
 .main-content {
-    padding: 4.5rem 2rem 4rem;
+    padding: 2.5rem 1.4rem 5rem;
     max-width: 900px;
-    margin: auto;
+    margin: 0 auto;
+    width: 100%;
 }
 
 h1 {
-    font-size: 2.3rem;
-    font-weight: 600;
-    margin-bottom: 3rem;
-    letter-spacing: 0.3px;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.8rem;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
 }
 
 /* ================= CARDS ================= */
@@ -199,30 +124,162 @@ h1 {
 
 .card {
     background: linear-gradient(145deg, #131c26, #111820);
-    padding: 2.1rem 2rem;
+    padding: 1.8rem;
     border-radius: 18px;
-    margin-bottom: 2.3rem;
+    margin-bottom: 1.6rem;
     border: 1px solid rgba(255,255,255,0.05);
     transition: 0.35s ease;
 }
 
 .card h2 {
-    font-size: 1.4rem;
-    margin-bottom: 0.7rem;
+    font-size: 1.25rem;
+    margin-bottom: 0.6rem;
     font-weight: 600;
 }
 
 .card p {
     color: var(--text-muted);
-    line-height: 1.6;
-    font-size: 0.98rem;
+    line-height: 1.65;
+    font-size: 0.95rem;
 }
 
 .card:hover {
-    border: 1px solid rgba(255, 189, 89, 0.65);
-    box-shadow:
-        0 0 25px rgba(255, 189, 89, 0.22),
-        0 0 60px rgba(255, 189, 89, 0.08);
-    transform: translateY(-3px);
+    border: 1px solid rgba(255, 189, 89, 0.55);
+    box-shadow: 0 0 25px rgba(255, 189, 89, 0.18), 0 0 60px rgba(255, 189, 89, 0.06);
+    transform: translateY(-2px);
 }
 
+/* ================= MOBILE RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.6rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .main-content {
+        padding: 2rem 1rem 4rem;
+    }
+
+    .topbar {
+        padding: 0 1rem;
+    }
+
+    .breadcrumb {
+        display: none;
+    }
+
+    .card {
+        padding: 1.3rem;
+        border-radius: 14px;
+    }
+
+    /* Stack any 2-col grids to single col */
+    .mech-grid,
+    .sim-wrapper,
+    .highlight-card {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Simulation canvas min height on mobile */
+    .sim-visual {
+        min-height: 320px !important;
+    }
+
+    /* Smaller metric grids */
+    .metric-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Preset buttons smaller */
+    .preset-btn {
+        font-size: 0.78rem;
+        padding: 0.5rem 0.4rem;
+    }
+
+    /* Timeline tweaks */
+    .timeline {
+        padding-left: 1.6rem;
+    }
+
+    /* Nav/app grids → single col */
+    .nav-grid,
+    .app-grid,
+    .future-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Hero stats wrap nicely */
+    .hero-stats {
+        gap: 1.4rem;
+    }
+
+    .stat-num {
+        font-size: 1.3rem !important;
+    }
+
+    /* Hero heading smaller */
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    /* Paper links stack */
+    .paper-link-row,
+    .app-links {
+        flex-direction: column;
+    }
+
+    /* Table scroll on mobile */
+    .compare-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    /* VDW graph smaller */
+    #vdwGraph {
+        height: 280px !important;
+    }
+
+    /* Size visual in Geckskin card */
+    .size-box {
+        width: 80px !important;
+        height: 108px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .mech-grid,
+    .sim-wrapper {
+        grid-template-columns: 1fr !important;
+    }
+
+    .highlight-card {
+        grid-template-columns: 1fr !important;
+    }
+
+    .nav-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}
+
+/* ================= RANGE INPUTS ================= */
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+    height: 20px;
+}
+
+input[type="number"],
+select {
+    width: 100%;
+    padding: 0.55rem 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: #0f1a22;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
