@@ -3,23 +3,74 @@
 <head>
     <title>Gecko Biomimicry</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero {
+            padding: 3.5rem 0 2.5rem;
+            border-bottom: 1px solid rgba(255,189,89,0.12);
+            margin-bottom: 2.8rem;
+        }
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(255,189,89,0.35);
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            margin-bottom: 1.2rem;
+        }
+        .hero h1 { font-size: 2.8rem; font-weight: 700; line-height: 1.15; margin-bottom: 1rem; }
+        .hero h1 span { color: var(--accent); }
+        .hero-sub { color: var(--text-muted); font-size: 1.05rem; line-height: 1.65; max-width: 620px; margin-bottom: 2rem; }
+        .hero-stats { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+        .stat { display: flex; flex-direction: column; }
+        .stat-num { font-size: 1.6rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+        .stat-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+        .section-label { font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.2rem; }
+        .nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.1rem; margin-bottom: 3rem; }
+        .nav-card { background: linear-gradient(145deg, #131c26, #111820); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.6rem 1.5rem; text-decoration: none; color: inherit; display: block; transition: 0.3s ease; position: relative; overflow: hidden; }
+        .nav-card:hover { border-color: rgba(255,189,89,0.5); box-shadow: 0 0 30px rgba(255,189,89,0.14), 0 4px 24px rgba(0,0,0,0.3); transform: translateY(-3px); }
+        .card-icon { font-size: 1.5rem; margin-bottom: 0.9rem; display: block; }
+        .nav-card h3 { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.45rem; }
+        .nav-card p { font-size: 0.87rem; color: var(--text-muted); line-height: 1.55; }
+        .card-arrow { position: absolute; right: 1.2rem; bottom: 1.2rem; font-size: 0.9rem; color: rgba(255,189,89,0.4); transition: 0.25s ease; }
+        .nav-card:hover .card-arrow { color: var(--accent); transform: translate(2px, -2px); }
+        .intro-card { background: linear-gradient(135deg, rgba(255,189,89,0.07), rgba(255,189,89,0.02)); border: 1px solid rgba(255,189,89,0.2); border-radius: 18px; padding: 2rem; margin-bottom: 2.8rem; }
+        .intro-card h2 { font-size: 1.2rem; color: var(--accent); margin-bottom: 0.7rem; }
+        .intro-card p { color: var(--text-muted); line-height: 1.7; font-size: 0.97rem; }
+    </style>
 </head>
 <body>
-
 <script src="js/layout.js"></script>
-
 <script>
 document.getElementById("page-content").innerHTML = `
-<h1>Gecko Inspired Adhesion Systems</h1>
-
-<div class="card">
-    <p>
-        A research-driven exploration of biomimetic adhesion systems inspired by
-        gecko setae, integrating physics, material science, and engineering.
-    </p>
+<div class="hero">
+    <span class="hero-tag">Biology / Biomimicry</span>
+    <h1>Gecko <span>Inspired</span><br>Adhesion Systems</h1>
+    <p class="hero-sub">An interactive research platform exploring how geckos defy gravity — and how science is engineering that ability into materials, robots, and medicine.</p>
+    <div class="hero-stats">
+        <div class="stat"><span class="stat-num">~200,000</span><span class="stat-label">Setae per toe</span></div>
+        <div class="stat"><span class="stat-num">0.3–0.6 nm</span><span class="stat-label">Van der Waals range</span></div>
+        <div class="stat"><span class="stat-num">136 kg</span><span class="stat-label">Load capacity (vs 5 kg for 3M)</span></div>
+        <div class="stat"><span class="stat-num">2002</span><span class="stat-label">Year mechanism discovered</span></div>
+    </div>
+</div>
+<div class="intro-card">
+    <h2>What is Gecko Biomimicry?</h2>
+    <p>Geckos can walk upside-down on glass without any glue — thanks to millions of microscopic hair-like structures called <strong>setae</strong> on their toes. Each seta branches into even tinier <strong>spatulae</strong>, which get close enough to surfaces to exploit <strong>van der Waals forces</strong> — weak intermolecular attractions that, combined across millions of contact points, generate a powerful, residue-free, and reversible grip. Scientists and engineers have spent two decades figuring out how to replicate this in synthetic materials.</p>
+</div>
+<p class="section-label">Explore the research</p>
+<div class="nav-grid">
+    <a class="nav-card" href="mechanism.html"><span class="card-icon">⚛️</span><h3>Mechanism</h3><p>Explore how van der Waals forces drive gecko adhesion with an interactive force explorer.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="setae.html"><span class="card-icon">🔬</span><h3>Setae 3D Model</h3><p>Scroll through a real-time 3D visualization from toe → lamellae → setae → spatulae → molecules.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="simulation.html"><span class="card-icon">📐</span><h3>Load Simulation</h3><p>Simulate real-world adhesion loads across Earth, Mars, and the ISS.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="applications.html"><span class="card-icon">🚀</span><h3>Applications</h3><p>From gecko tape to NASA's Astrobee — discover how this biology is reshaping engineering.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="timeline.html"><span class="card-icon">📅</span><h3>Timeline</h3><p>Two decades of breakthroughs — from Kellar Autumn's 2002 discovery to the ISS in 2021.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="future.html"><span class="card-icon">🔭</span><h3>Future Potential</h3><p>Nanotechnology, smart adhesives, and bio-inspired design — what comes next.</p><span class="card-arrow">↗</span></a>
+    <a class="nav-card" href="research.html"><span class="card-icon">📄</span><h3>Research Papers</h3><p>The foundational studies behind gecko adhesion and biomimetic engineering.</p><span class="card-arrow">↗</span></a>
 </div>
 `;
 </script>
-
 </body>
 </html>
