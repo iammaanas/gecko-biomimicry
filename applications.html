@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Applications</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .app-intro { color: var(--text-muted); line-height: 1.7; font-size: 0.98rem; margin-bottom: 2.8rem; max-width: 700px; }
+        .section-title { font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.4rem; margin-top: 2.8rem; }
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; margin-bottom: 1.4rem; }
+        .app-card { background: linear-gradient(145deg, #131c26, #111820); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 1.8rem; transition: 0.35s ease; position: relative; overflow: hidden; }
+        .app-card::after { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(255,189,89,0.07), transparent 70%); pointer-events: none; }
+        .app-card:hover { border-color: rgba(255,189,89,0.45); box-shadow: 0 0 32px rgba(255,189,89,0.12), 0 8px 32px rgba(0,0,0,0.3); transform: translateY(-4px); }
+        .app-badge { display: inline-block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.65rem; border-radius: 999px; margin-bottom: 1rem; font-weight: 600; }
+        .badge-tape { background: rgba(255,189,89,0.15); color: var(--accent); border: 1px solid rgba(255,189,89,0.3); }
+        .badge-robot { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1px solid rgba(100,200,255,0.25); }
+        .badge-medical { background: rgba(100,220,160,0.1); color: #64dc9f; border: 1px solid rgba(100,220,160,0.25); }
+        .badge-space { background: rgba(180,100,255,0.1); color: #c87fff; border: 1px solid rgba(180,100,255,0.25); }
+        .app-card h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.65rem; }
+        .app-card p { color: var(--text-muted); line-height: 1.65; font-size: 0.9rem; margin-bottom: 0.9rem; }
+        .app-detail { font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.8rem; margin-top: 0.8rem; }
+        .app-detail strong { color: var(--text-primary); }
+        .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 3rem; font-size: 0.9rem; }
+        .compare-table th { text-align: left; padding: 0.85rem 1rem; color: var(--accent); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid rgba(255,189,89,0.18); }
+        .compare-table td { padding: 0.85rem 1rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .compare-table tr:hover td { background: rgba(255,189,89,0.03); color: var(--text-primary); }
+        .highlight-val { color: var(--accent); font-weight: 600; }
+        .good { color: #4ade80; }
+        .bad { color: #f87171; }
+    </style>
+</head>
+<body>
+<script src="js/layout.js"></script>
+<script>
+document.getElementById("page-content").innerHTML = `
+<h1>Applications</h1>
+<p class="app-intro">
+    Gecko adhesion has inspired a spectrum of technologies — from everyday tape to spacecraft systems.
+    What unites them all is the same principle: millions of nanoscale contacts, each contributing a tiny van
+    der Waals force, collectively producing a powerful, clean, and reversible grip.
+</p>
+
+<p class="section-title">Adhesive Materials</p>
+<div class="app-grid">
+    <div class="app-card">
+        <span class="app-badge badge-tape">Tape</span>
+        <h2>Gecko Tape</h2>
+        <p>The most direct application — a reusable, residue-free adhesive tape that uses synthetic setae instead of chemical glue. Works on smooth, rough, wet, and even vacuum surfaces.</p>
+        <div class="app-detail">
+            <strong>Load capacity:</strong> up to 136 kg per palm-sized patch<br>
+            <strong>vs. 3M tape:</strong> 5 kg — a 27× improvement<br>
+            <strong>Key property:</strong> Fully reversible, leaves zero residue
+        </div>
+    </div>
+    <div class="app-card">
+        <span class="app-badge badge-medical">Medical</span>
+        <h2>Gecko-Inspired Bandages</h2>
+        <p>Developed at Harvard (2008), these bandages use PGSA pillars to adhere to skin without chemical irritants. They are breathable, biodegradable, and detach without damaging tissue.</p>
+        <div class="app-detail">
+            <strong>First implemented:</strong> 2008 — Harvard University<br>
+            <strong>Material:</strong> Patterned PGSA elastomer pillars<br>
+            <strong>Benefit:</strong> Reduces pain on removal, supports healing
+        </div>
+    </div>
+    <div class="app-card">
+        <span class="app-badge badge-medical">Medical</span>
+        <h2>Surgical Adhesives</h2>
+        <p>Biodegradable adhesive strips that replace sutures for dermal tissue. Gecko-inspired surgical tools use dry adhesion for precise tissue handling during minimally invasive procedures.</p>
+        <div class="app-detail">
+            <strong>Advantage over sutures:</strong> No puncture trauma<br>
+            <strong>Biodegradable:</strong> Breaks down naturally post-healing<br>
+            <strong>Use case:</strong> Wound closure, tissue manipulation
+        </div>
+    </div>
+</div>
+
+<p class="section-title">Robotics</p>
+<div class="app-grid">
+    <div class="app-card">
+        <span class="app-badge badge-robot">Robotics</span>
+        <h2>Stickybot (2005)</h2>
+        <p>Developed at Stanford by Mark Cutkosky, Stickybot was the first robot to use synthetic setae to climb smooth vertical surfaces. It demonstrated gecko adhesion could scale to macro-engineering.</p>
+        <div class="app-detail">
+            <strong>Institution:</strong> Stanford University<br>
+            <strong>Surface:</strong> Glass, acrylic, whiteboards<br>
+            <strong>Significance:</strong> First practical robot implementation
+        </div>
+    </div>
+    <div class="app-card">
+        <span class="app-badge badge-robot">Robotics</span>
+        <h2>Climbing Robots</h2>
+        <p>Modern climbing robots inspired by Stickybot can scale vertical walls and inverted surfaces for building inspection, bridge maintenance, and search-and-rescue in environments inaccessible to humans.</p>
+        <div class="app-detail">
+            <strong>Use cases:</strong> Infrastructure inspection, rescue ops<br>
+            <strong>Surfaces:</strong> Glass, concrete, metal panels<br>
+            <strong>Advantage:</strong> No suction, no chemicals needed
+        </div>
+    </div>
+    <div class="app-card">
+        <span class="app-badge badge-robot">Robotics</span>
+        <h2>Precision Grippers</h2>
+        <p>Gecko-inspired adaptive grippers use contact sensors combined with adhesive film to grip delicate objects — semiconductors, biological samples, fragile parts — without mechanical clamping force.</p>
+        <div class="app-detail">
+            <strong>Application:</strong> Semiconductor handling, lab automation<br>
+            <strong>Key feature:</strong> Zero contact force on the object<br>
+            <strong>Industries:</strong> Electronics, biomedical, manufacturing
+        </div>
+    </div>
+</div>
+
+<p class="section-title">Space Applications</p>
+<div class="app-grid">
+    <div class="app-card">
+        <span class="app-badge badge-space">Space</span>
+        <h2>NASA Astrobee</h2>
+        <p>Free-flying robots aboard the ISS that use gecko-inspired adhesives to attach to surfaces in microgravity without mechanical clamps. They assist astronauts and conduct autonomous experiments.</p>
+        <div class="app-detail">
+            <strong>Deployed:</strong> 2019 aboard the ISS<br>
+            <strong>Why gecko:</strong> Traditional adhesives fail in vacuum & microgravity<br>
+            <strong>Task:</strong> Object manipulation, cargo handling
+        </div>
+    </div>
+    <div class="app-card">
+        <span class="app-badge badge-space">Space</span>
+        <h2>NASA Gecko Grippers</h2>
+        <p>Synthetic setae grippers tested aboard the ISS (2021) designed for satellite servicing — capturing, docking, and releasing satellites in orbit using van der Waals contact forces alone.</p>
+        <div class="app-detail">
+            <strong>Tested:</strong> 2021 aboard ISS<br>
+            <strong>Target use:</strong> Satellite capture and servicing<br>
+            <strong>Advantage:</strong> Works in vacuum, zero-g, wide temperature range
+        </div>
+    </div>
+</div>
+
+<p class="section-title">Performance Comparison</p>
+<table class="compare-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Traditional Tape (3M)</th>
+            <th>Gecko-Inspired Adhesive</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Load Capacity</td><td class="bad">~5 kg</td><td class="good highlight-val">~136 kg</td></tr>
+        <tr><td>Residue on Removal</td><td class="bad">Yes (chemical)</td><td class="good">None</td></tr>
+        <tr><td>Reusability</td><td class="bad">Single use</td><td class="good">Thousands of cycles</td></tr>
+        <tr><td>Works Underwater</td><td class="bad">No</td><td class="good">Yes</td></tr>
+        <tr><td>Works in Vacuum</td><td class="bad">No</td><td class="good">Yes</td></tr>
+        <tr><td>Cost (per cm²)</td><td class="good">~$0.001</td><td class="bad highlight-val">~$10–$100</td></tr>
+        <tr><td>Manufacturing Complexity</td><td class="good">Low</td><td class="bad">Very High (nanofabrication)</td></tr>
+    </tbody>
+</table>
+`;
+</script>
+</body>
+</html>
