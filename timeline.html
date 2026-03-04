@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timeline</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .timeline-intro { color: var(--text-muted); line-height: 1.7; font-size: 0.98rem; margin-bottom: 3rem; max-width: 680px; }
+        .timeline { position: relative; padding-left: 2.4rem; }
+        .timeline::before { content: ''; position: absolute; left: 0.55rem; top: 0.5rem; bottom: 0.5rem; width: 2px; background: linear-gradient(180deg, var(--accent), rgba(255,189,89,0.1)); border-radius: 2px; }
+        .tl-item { position: relative; margin-bottom: 2.6rem; }
+        .tl-dot { position: absolute; left: -2.1rem; top: 0.3rem; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid #0a0f14; box-shadow: 0 0 10px rgba(255,189,89,0.5); transition: 0.3s ease; }
+        .tl-item:hover .tl-dot { box-shadow: 0 0 20px rgba(255,189,89,0.8); transform: scale(1.3); }
+        .tl-year { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 0.35rem; }
+        .tl-card { background: linear-gradient(145deg, #131c26, #111820); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 1.4rem 1.5rem; transition: 0.3s ease; cursor: default; }
+        .tl-item:hover .tl-card { border-color: rgba(255,189,89,0.3); box-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 20px rgba(255,189,89,0.06); }
+        .tl-card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .tl-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.6rem; }
+        .tl-tag { display: inline-block; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+        .tag-science { background: rgba(255,189,89,0.12); color: var(--accent); }
+        .tag-robot { background: rgba(100,200,255,0.1); color: #64c8ff; }
+        .tag-medical { background: rgba(100,220,160,0.1); color: #64dc9f; }
+        .tag-material { background: rgba(255,150,100,0.1); color: #ff9664; }
+        .tag-space { background: rgba(180,100,255,0.1); color: #c87fff; }
+        .tl-ref { font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-top: 0.5rem; }
+        .tl-ref a { color: rgba(255,189,89,0.5); text-decoration: none; }
+        .tl-ref a:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+<script src="js/layout.js"></script>
+<script>
+document.getElementById("page-content").innerHTML = `
+<h1>Timeline</h1>
+<p class="timeline-intro">
+    From the moment Kellar Autumn's team measured the first van der Waals force in a gecko seta, to NASA testing
+    gecko grippers aboard the International Space Station — two decades of science, engineering, and biology converging.
+</p>
+
+<div class="timeline">
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2000</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-science">Discovery</span>
+            <h2>First Measurement of Gecko Adhesion Forces</h2>
+            <p>Kellar Autumn and colleagues at Lewis &amp; Clark College publish the first quantitative measurements of van der Waals forces in individual gecko setae in <em>Nature</em> (2000). They demonstrate that a single seta can generate up to 200 µN of adhesive force — far more than expected.</p>
+            <div class="tl-ref">Autumn et al. (2000). <em>Nature</em> 405, 681–685.</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2002</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-science">Science</span>
+            <h2>Van der Waals Adhesion Confirmed in Setae</h2>
+            <p>Autumn's team publishes a landmark follow-up in the <em>Journal of Experimental Biology</em> (2002), conclusively proving the mechanism is van der Waals attraction — not suction, glue, or electrostatics. This confirmation opens the door to synthetic replication.</p>
+            <div class="tl-ref">Autumn et al. (2002). <em>PNAS</em> 99(19), 12252–12256.</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2005</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-robot">Robotics</span>
+            <h2>Stickybot — First Gecko-Climbing Robot</h2>
+            <p>Mark Cutkosky's team at Stanford University demonstrates <strong>Stickybot</strong>, the first robot to use synthetic directional setae to climb smooth vertical surfaces including glass and acrylic. This marks the first practical implementation of gecko adhesion principles in engineering.</p>
+            <div class="tl-ref">Kim et al. (2008). <em>Science</em> 319(5868), 1215.</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2008</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-medical">Medical</span>
+            <h2>Harvard Develops Gecko-Inspired Medical Adhesives</h2>
+            <p>Researchers at Harvard Medical School introduce the first gecko-inspired adhesive designed for biomedical use. Using patterned PGSA (poly(glycerol-co-sebacate) acrylate) pillars, they create bandages that adhere to wet tissue without irritation and detach without pain or residue.</p>
+            <div class="tl-ref">Mahdavi et al. (2008). <em>PNAS</em> 105(7), 2307–2312.</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2012</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-material">Material</span>
+            <h2>Geckskin — Reusable Adhesive Card</h2>
+            <p>The company Felsuma (spun out of UMass Amherst) unveils <strong>Geckskin</strong> — a credit-card-sized adhesive that can hold 700 pounds on a smooth wall and peels off cleanly. It replicates not just the setae structure but the tendon geometry of gecko toes to distribute load.</p>
+            <div class="tl-ref">Bartlett et al. (2012). <em>Advanced Materials</em> 24(8), 1078–1083.</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2015</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-robot">Robotics</span>
+            <h2>Stanford Human Climbing Demonstration</h2>
+            <p>Stanford engineers demonstrate gecko-inspired adhesive hand pads that allow a 70 kg adult to climb a vertical glass wall — the first human-scale demonstration of the technology. The system uses 24 adhesive tiles and works by engaging spatula-like microstructures directionally.</p>
+            <div class="tl-ref">Hawkes et al. (2015). <em>Journal of the Royal Society Interface</em> 12(102).</div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2019</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-space">Space</span>
+            <h2>NASA Deploys Astrobee on the ISS</h2>
+            <p>NASA deploys the <strong>Astrobee</strong> free-flying robots aboard the International Space Station. These autonomous robots use gecko-inspired adhesive pads to attach to ISS surfaces and handle objects in microgravity — replacing mechanical clamps that fail in zero-g environments.</p>
+            <div class="tl-ref">NASA Astrobee Program. <a href="https://www.nasa.gov/astrobee/" target="_blank">nasa.gov/astrobee</a></div>
+        </div>
+    </div>
+
+    <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2021</div>
+        <div class="tl-card">
+            <span class="tl-tag tag-space">Space</span>
+            <h2>Gecko Grippers Tested Aboard the ISS</h2>
+            <p>NASA tests dedicated <strong>Gecko Grippers</strong> — robotic end-effectors with synthetic setae surfaces — aboard the ISS for satellite capture and servicing tasks. The grippers successfully attach to and release objects in vacuum and microgravity, validating the technology for future on-orbit servicing missions.</p>
+            <div class="tl-ref">NASA Gecko Gripper Program. <a href="https://www.nasa.gov/missions/station/gecko-grippers-moving-on-up/" target="_blank">nasa.gov/gecko-grippers</a></div>
+        </div>
+    </div>
+
+</div>
+`;
+</script>
+</body>
+</html>
