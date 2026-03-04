@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Future Potential</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .future-intro { color: var(--text-muted); line-height: 1.7; font-size: 0.98rem; margin-bottom: 2.8rem; max-width: 700px; }
+        .section-label { font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.4rem; margin-top: 2.6rem; }
+        .future-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.2rem; margin-bottom: 1.6rem; }
+        .future-card { background: linear-gradient(145deg, #131c26, #111820); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 1.8rem; transition: 0.35s ease; }
+        .future-card:hover { border-color: rgba(255,189,89,0.35); box-shadow: 0 0 28px rgba(255,189,89,0.1), 0 8px 32px rgba(0,0,0,0.25); transform: translateY(-3px); }
+        .future-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+        .future-card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-primary); }
+        .future-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.8rem; }
+        .future-status { display: inline-block; font-size: 0.72rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+        .status-research { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1px solid rgba(100,200,255,0.2); }
+        .status-emerging { background: rgba(255,189,89,0.12); color: var(--accent); border: 1px solid rgba(255,189,89,0.25); }
+        .status-early { background: rgba(100,220,160,0.1); color: #64dc9f; border: 1px solid rgba(100,220,160,0.2); }
+        .challenge-block { background: linear-gradient(135deg, rgba(248,113,113,0.06), rgba(248,113,113,0.02)); border: 1px solid rgba(248,113,113,0.15); border-radius: 16px; padding: 1.8rem; margin-bottom: 2rem; }
+        .challenge-block h2 { font-size: 1.1rem; color: #f87171; margin-bottom: 1rem; }
+        .challenge-list { list-style: none; padding: 0; }
+        .challenge-list li { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 0.8rem; }
+        .challenge-list li:last-child { border-bottom: none; }
+        .challenge-list li::before { content: '—'; color: #f87171; flex-shrink: 0; }
+        .outlook-card { background: linear-gradient(135deg, rgba(255,189,89,0.06), rgba(255,189,89,0.02)); border: 1px solid rgba(255,189,89,0.18); border-radius: 16px; padding: 1.8rem; margin-bottom: 3rem; }
+        .outlook-card h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 0.8rem; }
+        .outlook-card p { color: var(--text-muted); font-size: 0.93rem; line-height: 1.7; }
+    </style>
+</head>
+<body>
+<script src="js/layout.js"></script>
+<script>
+document.getElementById("page-content").innerHTML = `
+<h1>Future Potential</h1>
+<p class="future-intro">
+    Gecko adhesion research is still in its early stages relative to what it could become.
+    Current synthetic setae are orders of magnitude cruder than the biological original — but that gap
+    is closing fast, driven by advances in nanotechnology, materials science, and AI-driven design.
+</p>
+
+<p class="section-label">Emerging Directions</p>
+<div class="future-grid">
+
+    <div class="future-card">
+        <span class="future-icon">🧬</span>
+        <h2>Carbon Nanotube Setae</h2>
+        <p>Carbon nanotubes have a diameter of ~1 nm — comparable to natural spatulae — and extremely high surface area. Researchers are growing aligned CNT forests that mimic gecko foot geometry with unprecedented adhesion strength per unit area.</p>
+        <span class="future-status status-research">Active Research</span>
+    </div>
+
+    <div class="future-card">
+        <span class="future-icon">🤖</span>
+        <h2>Smart Switchable Adhesion</h2>
+        <p>Next-gen gecko tape will be controllable — toggling between adhesive and non-adhesive states via electrical signal, temperature, humidity, or light. This enables robotic grippers that switch grip on demand without mechanical actuation.</p>
+        <span class="future-status status-emerging">Emerging</span>
+    </div>
+
+    <div class="future-card">
+        <span class="future-icon">🏥</span>
+        <h2>Injectable Tissue Adhesives</h2>
+        <p>Building on the Harvard bandage work, researchers are developing injectable biodegradable nano-pillar adhesives for internal surgical use — closing wounds inside the body without sutures, reducing inflammation and infection risk.</p>
+        <span class="future-status status-research">Active Research</span>
+    </div>
+
+    <div class="future-card">
+        <span class="future-icon">🛸</span>
+        <h2>Debris Capture in Orbit</h2>
+        <p>Over 27,000 pieces of orbital debris threaten satellites. Gecko-inspired grippers on deorbit vehicles could capture tumbling debris without mechanical grappling. NASA and ESA are both exploring this for active debris removal missions.</p>
+        <span class="future-status status-emerging">Emerging</span>
+    </div>
+
+    <div class="future-card">
+        <span class="future-icon">🏗️</span>
+        <h2>Construction &amp; Inspection Robots</h2>
+        <p>Wall-climbing robots with gecko adhesion could inspect skyscrapers, bridges, and offshore platforms without scaffolding. With improved load capacity and terrain adaptability, these could replace human rope-access workers in hazardous environments.</p>
+        <span class="future-status status-early">Early Stage</span>
+    </div>
+
+    <div class="future-card">
+        <span class="future-icon">💡</span>
+        <h2>AI-Optimized Setae Design</h2>
+        <p>Machine learning is now being applied to optimize setae geometry — angle, tip shape, density, and material — for specific surfaces. This could drastically compress the design cycle from years of trial-and-error to weeks of simulation-guided fabrication.</p>
+        <span class="future-status status-research">Active Research</span>
+    </div>
+
+</div>
+
+<p class="section-label">Current Challenges</p>
+<div class="challenge-block">
+    <h2>What's holding gecko adhesives back?</h2>
+    <ul class="challenge-list">
+        <li>Manufacturing cost: nanofabrication of precise setae arrays costs $1,000+ per cm², vs. $0.001 for conventional tape</li>
+        <li>Scalability: most lab demonstrations use cm²-scale patches; scaling to m² without defects is unsolved</li>
+        <li>Durability: synthetic setae degrade significantly after thousands of attach-detach cycles; natural gecko feet self-clean and regenerate</li>
+        <li>Surface sensitivity: performance drops sharply on dusty, oily, or highly textured surfaces</li>
+        <li>Temperature extremes: many polymer setae deform at temperatures above 80°C or below -40°C</li>
+        <li>Self-cleaning: geckos recover adhesion by dragging their feet; synthetic materials lack this ability</li>
+    </ul>
+</div>
+
+<div class="outlook-card">
+    <h2>The 10-Year Outlook</h2>
+    <p>
+        The consensus among researchers is that commercial gecko adhesives for niche high-value applications — space, medical, precision manufacturing — are 5–10 years away at current trajectories. Mass-market applications like reusable consumer tape or wearable grippers likely require a breakthrough in scalable nanofabrication, possibly enabled by advances in self-assembly or 3D nanolithography. The biological template — perfected over 200 million years of evolution — remains significantly ahead of the best synthetic versions, making gecko feet one of the most studied structures in all of materials science.
+    </p>
+</div>
+`;
+</script>
+</body>
+</html>
