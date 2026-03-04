@@ -25,6 +25,9 @@ const layout = `
         <a class="nav-item ${currentPage === "mechanism.html" ? "active" : ""}" href="mechanism.html">Mechanism</a>
         <a class="nav-item ${currentPage === "simulation.html" ? "active" : ""}" href="simulation.html">Simulation</a>
         <a class="nav-item ${currentPage === "setae.html" ? "active" : ""}" href="setae.html">Setae Model</a>
+        <a class="nav-item ${currentPage === "applications.html" ? "active" : ""}" href="applications.html">Applications</a>
+        <a class="nav-item ${currentPage === "timeline.html" ? "active" : ""}" href="timeline.html">Timeline</a>
+        <a class="nav-item ${currentPage === "future.html" ? "active" : ""}" href="future.html">Future Potential</a>
         <a class="nav-item ${currentPage === "presentation.html" ? "active" : ""}" href="presentation.html">Presentation</a>
         <a class="nav-item ${currentPage === "about.html" ? "active" : ""}" href="about.html">About</a>
     </div>
