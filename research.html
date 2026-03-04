@@ -3,37 +3,120 @@
 <head>
     <title>Research</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .research-intro { color: var(--text-muted); line-height: 1.7; font-size: 0.98rem; margin-bottom: 2.5rem; max-width: 680px; }
+        .section-label { font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; margin-top: 2.4rem; }
+        .paper-card { background: linear-gradient(145deg, #131c26, #111820); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1.6rem 1.8rem; margin-bottom: 1rem; text-decoration: none; color: inherit; display: block; transition: 0.3s ease; position: relative; }
+        .paper-card:hover { border-color: rgba(255,189,89,0.45); box-shadow: 0 0 24px rgba(255,189,89,0.1); transform: translateX(4px); }
+        .paper-meta { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+        .paper-year { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+        .paper-journal { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
+        .paper-tag { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+        .tag-fundamental { background: rgba(255,189,89,0.12); color: var(--accent); }
+        .tag-bio { background: rgba(100,220,160,0.1); color: #64dc9f; }
+        .tag-robot { background: rgba(100,200,255,0.1); color: #64c8ff; }
+        .tag-medical { background: rgba(255,150,100,0.1); color: #ff9664; }
+        .tag-material { background: rgba(180,100,255,0.1); color: #c87fff; }
+        .paper-card h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .paper-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+        .doi-link { position: absolute; right: 1.4rem; top: 50%; transform: translateY(-50%); font-size: 0.78rem; color: rgba(255,189,89,0.4); transition: 0.2s; }
+        .paper-card:hover .doi-link { color: var(--accent); }
+    </style>
 </head>
 <body>
-
 <script src="js/layout.js"></script>
-
 <script>
 document.getElementById("page-content").innerHTML = `
-<h1>Referenced Research Papers</h1>
+<h1>Research Papers</h1>
+<p class="research-intro">
+    The science of gecko adhesion spans biology, physics, chemistry, and engineering. These are the key studies
+    that built our understanding — from the first force measurements on individual setae, to robots climbing
+    glass, to medical adhesives in the operating room.
+</p>
 
-<a href="https://doi.org/10.1038/417795a" target="_blank" class="card-link">
-    <div class="card">
-        <h2>Kellar Autumn (2002)</h2>
-        <p>Experimental validation of van der Waals adhesion in gecko setae.</p>
+<p class="section-label">Foundational Biology &amp; Physics</p>
+
+<a href="https://doi.org/10.1038/35079073" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2000</span>
+        <span class="paper-journal">Nature</span>
+        <span class="paper-tag tag-fundamental">Fundamental</span>
     </div>
+    <h2>Autumn et al. — Adhesive Force of a Single Gecko Foot-Hair</h2>
+    <p>First direct measurement of the adhesive force of a single seta using force transducers. Demonstrated that individual setae produce up to 200 µN and that the mechanism is consistent with van der Waals interactions, not suction or glue.</p>
+    <span class="doi-link">→ doi:10.1038/35079073</span>
 </a>
 
-<a href="https://doi.org/10.1126/science.1109485" target="_blank" class="card-link">
-    <div class="card">
-        <h2>Stanford Stickybot (2005)</h2>
-        <p>First robotic implementation of synthetic gecko-inspired adhesion.</p>
+<a href="https://doi.org/10.1073/pnas.192252799" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2002</span>
+        <span class="paper-journal">PNAS</span>
+        <span class="paper-tag tag-fundamental">Fundamental</span>
     </div>
+    <h2>Autumn et al. — Evidence for van der Waals Adhesion in Gecko Setae</h2>
+    <p>Conclusive evidence that van der Waals forces (not capillarity or suction) are responsible for gecko adhesion. Measured adhesion on hydrophobic and hydrophilic surfaces and found it correlated with surface energy, ruling out water-based mechanisms.</p>
+    <span class="doi-link">→ doi:10.1073/pnas.192252799</span>
 </a>
 
-<a href="https://doi.org/10.1126/science.1158233" target="_blank" class="card-link">
-    <div class="card">
-        <h2>Harvard Medical Adhesives (2008)</h2>
-        <p>Development of non-irritating biomedical adhesive systems.</p>
+<a href="https://doi.org/10.1098/rsif.2006.0164" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2006</span>
+        <span class="paper-journal">Journal of the Royal Society Interface</span>
+        <span class="paper-tag tag-bio">Biology</span>
     </div>
+    <h2>Arzt et al. — From Micro to Nano Contacts in Biological Attachment Devices</h2>
+    <p>Comparative analysis of adhesion structures across 8 climbing animals — gecko, spider, beetle, fly, and more. Shows a universal scaling law: smaller body mass correlates with larger contact elements, providing insight into evolutionary optimization of adhesion.</p>
+    <span class="doi-link">→ doi:10.1098/rsif.2006.0164</span>
+</a>
+
+<p class="section-label">Robotics &amp; Engineering</p>
+
+<a href="https://doi.org/10.1126/science.1146885" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2008</span>
+        <span class="paper-journal">Science</span>
+        <span class="paper-tag tag-robot">Robotics</span>
+    </div>
+    <h2>Kim et al. — Whole Body Adhesion: Hierarchical, Directional, and Distributed Control</h2>
+    <p>The Stickybot paper. Describes the design of Stanford's gecko-inspired climbing robot, demonstrating that directional dry adhesion using synthetic elastomer setae can support robotic locomotion on smooth vertical surfaces.</p>
+    <span class="doi-link">→ doi:10.1126/science.1146885</span>
+</a>
+
+<a href="https://doi.org/10.1098/rsif.2014.1085" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2015</span>
+        <span class="paper-journal">Journal of the Royal Society Interface</span>
+        <span class="paper-tag tag-robot">Robotics</span>
+    </div>
+    <h2>Hawkes et al. — Human Climbing with Efficiently Scaled Gecko-Inspired Dry Adhesives</h2>
+    <p>First demonstration of a human (70 kg) climbing a vertical glass wall using gecko-inspired adhesive hand pads. Uses 24 adhesive tiles and directional loading — proving the technology can scale to human bodyweight.</p>
+    <span class="doi-link">→ doi:10.1098/rsif.2014.1085</span>
+</a>
+
+<p class="section-label">Medical &amp; Materials</p>
+
+<a href="https://doi.org/10.1073/pnas.0712117105" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2008</span>
+        <span class="paper-journal">PNAS</span>
+        <span class="paper-tag tag-medical">Medical</span>
+    </div>
+    <h2>Mahdavi et al. — A Biodegradable and Biocompatible Gecko-Inspired Tissue Adhesive</h2>
+    <p>Harvard team introduces the first gecko-inspired biomedical adhesive using PGSA micropillar arrays. Tested on wet tissue, demonstrating strong adhesion, gentle detachment, and biocompatibility — opening the path to suture-free wound closure.</p>
+    <span class="doi-link">→ doi:10.1073/pnas.0712117105</span>
+</a>
+
+<a href="https://doi.org/10.1002/adma.201103704" target="_blank" class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2012</span>
+        <span class="paper-journal">Advanced Materials</span>
+        <span class="paper-tag tag-material">Materials</span>
+    </div>
+    <h2>Bartlett et al. — Looking Beyond Fibrillar Features to Scale Gecko-Like Adhesion</h2>
+    <p>Introduces Geckskin — a material that replicates gecko toe geometry including the tendon structure, not just the setae. A palm-sized patch holds over 300 kg on a smooth wall. Demonstrates that whole-structure compliance is as important as nanoscale fibrils.</p>
+    <span class="doi-link">→ doi:10.1002/adma.201103704</span>
 </a>
 `;
 </script>
-
 </body>
 </html>
