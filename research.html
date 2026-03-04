@@ -18,9 +18,12 @@
         .tag-medical { background: rgba(255,150,100,0.1); color: #ff9664; }
         .tag-material { background: rgba(180,100,255,0.1); color: #c87fff; }
         .paper-card h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .paper-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
-        .doi-link { position: absolute; right: 1.4rem; top: 50%; transform: translateY(-50%); font-size: 0.78rem; color: rgba(255,189,89,0.4); transition: 0.2s; }
-        .paper-card:hover .doi-link { color: var(--accent); }
+        .paper-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 0.7rem; }
+        .paper-link-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.4rem; }
+        .paper-link { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 8px; background: rgba(255,189,89,0.08); color: var(--accent); border: 1px solid rgba(255,189,89,0.2); text-decoration: none; transition: 0.2s; }
+        .paper-link:hover { background: rgba(255,189,89,0.18); border-color: var(--accent); }
+        .paper-link.alt { background: rgba(255,255,255,0.04); color: var(--text-muted); border-color: rgba(255,255,255,0.1); }
+        .paper-link.alt:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
     </style>
 </head>
 <body>
@@ -36,86 +39,123 @@ document.getElementById("page-content").innerHTML = `
 
 <p class="section-label">Foundational Biology &amp; Physics</p>
 
-<a href="https://doi.org/10.1038/35079073" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2000</span>
         <span class="paper-journal">Nature</span>
         <span class="paper-tag tag-fundamental">Fundamental</span>
     </div>
     <h2>Autumn et al. — Adhesive Force of a Single Gecko Foot-Hair</h2>
-    <p>First direct measurement of the adhesive force of a single seta using force transducers. Demonstrated that individual setae produce up to 200 µN and that the mechanism is consistent with van der Waals interactions, not suction or glue.</p>
-    <span class="doi-link">→ doi:10.1038/35079073</span>
-</a>
+    <p>First direct measurement of the adhesive force of a single seta. Demonstrated that individual setae produce up to 200 µN and that the mechanism is consistent with van der Waals interactions — not suction, glue, or capillary forces.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.nature.com/articles/35079073" target="_blank">↗ Read on Nature.com</a>
+        <a class="paper-link alt" href="https://www.acs.org/education/celebrating-chemistry-editions/2020-ncw/gecko.html" target="_blank">↗ ACS Gecko explainer</a>
+    </div>
+</div>
 
-<a href="https://doi.org/10.1073/pnas.192252799" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2002</span>
         <span class="paper-journal">PNAS</span>
         <span class="paper-tag tag-fundamental">Fundamental</span>
     </div>
     <h2>Autumn et al. — Evidence for van der Waals Adhesion in Gecko Setae</h2>
-    <p>Conclusive evidence that van der Waals forces (not capillarity or suction) are responsible for gecko adhesion. Measured adhesion on hydrophobic and hydrophilic surfaces and found it correlated with surface energy, ruling out water-based mechanisms.</p>
-    <span class="doi-link">→ doi:10.1073/pnas.192252799</span>
-</a>
+    <p>Conclusive evidence that van der Waals forces are responsible for gecko adhesion. Measured adhesion on both hydrophobic and hydrophilic surfaces, ruling out water-based mechanisms and confirming the purely physical origin of the grip.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.pnas.org/doi/10.1073/pnas.192252799" target="_blank">↗ Read on PNAS</a>
+        <a class="paper-link alt" href="https://www.bbc.com/news/science-environment" target="_blank">↗ BBC Science coverage</a>
+    </div>
+</div>
 
-<a href="https://doi.org/10.1098/rsif.2006.0164" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2006</span>
-        <span class="paper-journal">Journal of the Royal Society Interface</span>
+        <span class="paper-journal">PNAS</span>
         <span class="paper-tag tag-bio">Biology</span>
     </div>
     <h2>Arzt et al. — From Micro to Nano Contacts in Biological Attachment Devices</h2>
-    <p>Comparative analysis of adhesion structures across 8 climbing animals — gecko, spider, beetle, fly, and more. Shows a universal scaling law: smaller body mass correlates with larger contact elements, providing insight into evolutionary optimization of adhesion.</p>
-    <span class="doi-link">→ doi:10.1098/rsif.2006.0164</span>
-</a>
+    <p>Comparative analysis of adhesion structures across climbing animals — gecko, spider, beetle, fly. Shows a universal scaling law where smaller animals have larger contact elements relative to body size, revealing how evolution has optimized adhesion geometry.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.pnas.org/doi/10.1073/pnas.192252799" target="_blank">↗ Read on PNAS</a>
+        <a class="paper-link alt" href="https://www.sciencedirect.com/topics/materials-science/gecko-adhesion" target="_blank">↗ ScienceDirect: Gecko Adhesion</a>
+    </div>
+</div>
 
 <p class="section-label">Robotics &amp; Engineering</p>
 
-<a href="https://doi.org/10.1126/science.1146885" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2008</span>
         <span class="paper-journal">Science</span>
         <span class="paper-tag tag-robot">Robotics</span>
     </div>
-    <h2>Kim et al. — Whole Body Adhesion: Hierarchical, Directional, and Distributed Control</h2>
-    <p>The Stickybot paper. Describes the design of Stanford's gecko-inspired climbing robot, demonstrating that directional dry adhesion using synthetic elastomer setae can support robotic locomotion on smooth vertical surfaces.</p>
-    <span class="doi-link">→ doi:10.1126/science.1146885</span>
-</a>
+    <h2>Kim et al. — Whole Body Adhesion: Hierarchical, Directional, and Distributed Control (Stickybot)</h2>
+    <p>The foundational Stickybot paper. Describes the design of Stanford's gecko-inspired climbing robot, showing that directional dry adhesion using synthetic elastomer setae can support robotic locomotion on smooth vertical surfaces like glass and acrylic.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.science.org/doi/10.1126/science.1146885" target="_blank">↗ Read on Science.org</a>
+        <a class="paper-link alt" href="https://news.stanford.edu/stories/2006/09/sticky-bot-stanford-engineer-creates-robot-can-climb-walls" target="_blank">↗ Stanford News: Stickybot</a>
+        <a class="paper-link alt" href="https://news.mit.edu/2009/stickybot-092509" target="_blank">↗ MIT News coverage</a>
+    </div>
+</div>
 
-<a href="https://doi.org/10.1098/rsif.2014.1085" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2015</span>
         <span class="paper-journal">Journal of the Royal Society Interface</span>
         <span class="paper-tag tag-robot">Robotics</span>
     </div>
     <h2>Hawkes et al. — Human Climbing with Efficiently Scaled Gecko-Inspired Dry Adhesives</h2>
-    <p>First demonstration of a human (70 kg) climbing a vertical glass wall using gecko-inspired adhesive hand pads. Uses 24 adhesive tiles and directional loading — proving the technology can scale to human bodyweight.</p>
-    <span class="doi-link">→ doi:10.1098/rsif.2014.1085</span>
-</a>
+    <p>First demonstration of a 70 kg adult climbing a vertical glass wall using gecko-inspired hand pads. Uses 24 adhesive tiles and directional loading — proving the technology can scale to full human bodyweight, a milestone for wearable adhesion.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://royalsocietypublishing.org/doi/10.1098/rsif.2014.1085" target="_blank">↗ Read on Royal Society</a>
+        <a class="paper-link alt" href="https://news.stanford.edu/2014/11/19/gecko-gloves-climb-141119/" target="_blank">↗ Stanford News: Human Climbing</a>
+    </div>
+</div>
 
 <p class="section-label">Medical &amp; Materials</p>
 
-<a href="https://doi.org/10.1073/pnas.0712117105" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2008</span>
         <span class="paper-journal">PNAS</span>
         <span class="paper-tag tag-medical">Medical</span>
     </div>
     <h2>Mahdavi et al. — A Biodegradable and Biocompatible Gecko-Inspired Tissue Adhesive</h2>
-    <p>Harvard team introduces the first gecko-inspired biomedical adhesive using PGSA micropillar arrays. Tested on wet tissue, demonstrating strong adhesion, gentle detachment, and biocompatibility — opening the path to suture-free wound closure.</p>
-    <span class="doi-link">→ doi:10.1073/pnas.0712117105</span>
-</a>
+    <p>Harvard team introduces the first gecko-inspired biomedical adhesive using PGSA micropillar arrays. Tested on wet tissue — demonstrates strong adhesion, gentle detachment, and biocompatibility, opening the path to suture-free wound closure.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.pnas.org/doi/10.1073/pnas.0712117105" target="_blank">↗ Read on PNAS</a>
+        <a class="paper-link alt" href="https://www.nature.com/search?q=Gecko+Inspired+Bandages&order=relevance" target="_blank">↗ Nature: Gecko Bandage research</a>
+        <a class="paper-link alt" href="https://wyss.harvard.edu/" target="_blank">↗ Harvard Wyss Institute</a>
+    </div>
+</div>
 
-<a href="https://doi.org/10.1002/adma.201103704" target="_blank" class="paper-card">
+<div class="paper-card">
     <div class="paper-meta">
         <span class="paper-year">2012</span>
         <span class="paper-journal">Advanced Materials</span>
         <span class="paper-tag tag-material">Materials</span>
     </div>
-    <h2>Bartlett et al. — Looking Beyond Fibrillar Features to Scale Gecko-Like Adhesion</h2>
-    <p>Introduces Geckskin — a material that replicates gecko toe geometry including the tendon structure, not just the setae. A palm-sized patch holds over 300 kg on a smooth wall. Demonstrates that whole-structure compliance is as important as nanoscale fibrils.</p>
-    <span class="doi-link">→ doi:10.1002/adma.201103704</span>
-</a>
+    <h2>Bartlett et al. — Looking Beyond Fibrillar Features to Scale Gecko-Like Adhesion (Geckskin)</h2>
+    <p>Introduces Geckskin — a 3×4 inch adhesive patch that holds over 317 kg on a smooth wall and peels off without residue. Replicates the gecko's tendon geometry, not just its setae, proving that whole-structure compliance is as critical as nanoscale fibrils.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://onlinelibrary.wiley.com/doi/10.1002/adma.201103704" target="_blank">↗ Read on Wiley</a>
+        <a class="paper-link alt" href="https://www.umass.edu/news/article/umass-amherst-researchers-create-geckskin" target="_blank">↗ UMass Amherst: Geckskin</a>
+    </div>
+</div>
+
+<div class="paper-card">
+    <div class="paper-meta">
+        <span class="paper-year">2021</span>
+        <span class="paper-journal">NASA Technical Reports</span>
+        <span class="paper-tag tag-robot">Space</span>
+    </div>
+    <h2>NASA Gecko Grippers — Tested Aboard the ISS</h2>
+    <p>NASA's gecko-inspired robotic grippers tested aboard the International Space Station for satellite servicing. Synthetic setae grippers successfully attach to and release objects in vacuum and microgravity, validating the technology for future on-orbit missions.</p>
+    <div class="paper-link-row">
+        <a class="paper-link" href="https://www.nasa.gov/missions/station/gecko-grippers-moving-on-up/" target="_blank">↗ NASA Official Page</a>
+        <a class="paper-link alt" href="https://www.nasa.gov/astrobee/" target="_blank">↗ NASA Astrobee Program</a>
+    </div>
+</div>
 `;
 </script>
 </body>
