@@ -1,491 +1,654 @@
-// js/setae.js
-// Rebuilt: hierarchical, semi-realistic morphing (toe -> lamellae -> aligned setae -> focused spatulae -> molecules)
-// Works with Three.js r149 (non-module) and global OrbitControls; conservative counts for performance.
+window.addEventListener('load', () => {
+  const canvas = document.getElementById('stage-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-window.addEventListener("load", () => {
-  try {
-    if (typeof THREE === "undefined") {
-      alert("Three.js not loaded. Check CDN.");
-      return;
-    }
+  let W, H, dpr;
 
-    const container = document.getElementById("three-container");
-    if (!container) { alert("#three-container missing"); return; }
-
-    // remove previous canvas
-    const old = container.querySelector("canvas");
-    if (old) old.remove();
-
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.domElement.id = "three-canvas";
-    renderer.domElement.style.position = "fixed";
-    renderer.domElement.style.top = "0";
-    renderer.domElement.style.left = "0";
-    renderer.domElement.style.width = "100vw";
-    renderer.domElement.style.height = "100vh";
-    renderer.domElement.style.zIndex = "1";
-    container.appendChild(renderer.domElement);
-
-    // Scene & Camera
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0f14);
-
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
-    const START_Z = 140, MID_Z = 56, CLOSE_Z = 8;
-    camera.position.set(0, 28, START_Z);
-
-    // Controls (manual only)
-    let controls = null;
-    if (typeof OrbitControls !== "undefined") {
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.08;
-      controls.enablePan = false;
-      controls.rotateSpeed = 0.5;
-    }
-
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.62));
-    const key = new THREE.DirectionalLight(0xffd89a, 1.1);
-    key.position.set(30, 60, 30);
-    scene.add(key);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.12);
-    fill.position.set(-30, 10, -40);
-    scene.add(fill);
-
-    // Substrate (wall)
-    const wall = new THREE.Mesh(
-      new THREE.PlaneGeometry(360, 360),
-      new THREE.MeshStandardMaterial({ color: 0x0d1214, roughness: 0.95 })
-    );
-    wall.rotation.x = -Math.PI / 2;
-    wall.position.y = -2;
-    scene.add(wall);
-
-    // ---------------------------
-    // TOE (stylized semi-realistic)
-    // ---------------------------
-    const toeGroup = new THREE.Group();
-    const leath = new THREE.MeshStandardMaterial({ color: 0x231b18, roughness: 0.6, metalness: 0.03 });
-    const padMat = new THREE.MeshStandardMaterial({ color: 0x162028, roughness: 0.86 });
-
-    const sBig = new THREE.SphereGeometry(8, 28, 20);
-    const sMed = new THREE.SphereGeometry(6.5, 26, 18);
-
-    const A = new THREE.Mesh(sBig, leath); A.position.set(-10, 6.2, 0); A.scale.set(0.42, 0.24, 0.8); toeGroup.add(A);
-    const B = new THREE.Mesh(sBig, leath); B.position.set(0, 5.9, 0); B.scale.set(0.54, 0.28, 1.02); toeGroup.add(B);
-    const C = new THREE.Mesh(sMed, leath); C.position.set(11, 6.2, 0); C.scale.set(0.32, 0.22, 0.7); toeGroup.add(C);
-
-    const pad = new THREE.Mesh(new THREE.CircleGeometry(32, 48), padMat);
-    pad.rotation.x = -Math.PI / 2;
-    pad.position.set(0, 0.72, 0);
-    toeGroup.add(pad);
-
-    const gloss = new THREE.Mesh(
-      new THREE.CircleGeometry(18, 32),
-      new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.28, metalness: 0.02, transparent: true, opacity: 0.12 })
-    );
-    gloss.rotation.x = -Math.PI / 2;
-    gloss.position.set(-2, 6.5, -2.2);
-    toeGroup.add(gloss);
-
-    toeGroup.position.set(0, 10, 0);
-    scene.add(toeGroup);
-
-    // ---------------------------
-    // Lamellae (parallel ridges)
-    // ---------------------------
-    const LAMELLA_COUNT = 6;
-    const LAMELLA_LENGTH = 70;
-    const LAMELLA_WIDTH = 8;
-    const lamellaeGroup = new THREE.Group();
-    const lamMat = new THREE.MeshStandardMaterial({ color: 0x142128, roughness: 0.9, metalness: 0.01 });
-
-    for (let i = 0; i < LAMELLA_COUNT; i++) {
-      // use thin rounded box for ridge
-      const g = new THREE.BoxGeometry(LAMELLA_LENGTH, 1.6, LAMELLA_WIDTH, 8, 1, 1);
-      // gentle arc on geometry vertices
-      for (let vi = 0; vi < g.attributes.position.count; vi++) {
-        const x = g.attributes.position.getX(vi);
-        const z = g.attributes.position.getZ(vi);
-        // slight curvature
-        const curve = Math.cos((x / LAMELLA_LENGTH) * Math.PI) * 0.4;
-        g.attributes.position.setY(vi, g.attributes.position.getY(vi) + curve);
-      }
-      g.computeVertexNormals();
-      const mesh = new THREE.Mesh(g, lamMat);
-      const offset = (i - Math.floor(LAMELLA_COUNT / 2)) * (LAMELLA_WIDTH + 1.0);
-      mesh.position.set(0, 1.25, offset);
-      mesh.rotation.x = -Math.PI / 2; // lying flat initially; we'll rotate to match pad
-      lamellaeGroup.add(mesh);
-    }
-    lamellaeGroup.position.set(0, 0.6, 0);
-    scene.add(lamellaeGroup);
-
-    // ---------------------------
-    // Setae (instanced, aligned brush)
-    // ---------------------------
-    const SETAE_PER_LAMELLA_X = 12; // along length
-    const SETAE_PER_LAMELLA_Z = 6;  // across width
-    const SETAE_COUNT = LAMELLA_COUNT * SETAE_PER_LAMELLA_X * SETAE_PER_LAMELLA_Z; // conservative
-    const setaeGeom = new THREE.CylinderGeometry(0.038, 0.11, 1.0, 8, 1, true);
-    const setaeMat = new THREE.MeshStandardMaterial({
-      color: 0xffbd59,
-      emissive: 0xffcfa0,
-      emissiveIntensity: 0.02,
-      roughness: 0.7,
-      transparent: true,
-      opacity: 0.0
-    });
-    const setaeInst = new THREE.InstancedMesh(setaeGeom, setaeMat, SETAE_COUNT);
-    setaeInst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    scene.add(setaeInst);
-
-    // Build ordered setae array (aligned)
-    const setaeInfo = []; // {x,y,z,length,lean,twist}
-    const baseXStart = -LAMELLA_LENGTH / 2 + 4;
-    for (let li = 0; li < LAMELLA_COUNT; li++) {
-      const lamZcenter = (li - (LAMELLA_COUNT - 1) / 2) * (LAMELLA_WIDTH + 1.0);
-      for (let xi = 0; xi < SETAE_PER_LAMELLA_X; xi++) {
-        const localX = baseXStart + (xi / (SETAE_PER_LAMELLA_X - 1)) * (LAMELLA_LENGTH - 8);
-        for (let zi = 0; zi < SETAE_PER_LAMELLA_Z; zi++) {
-          // distribute across lamella width with small jitter
-          const localZ = lamZcenter + (zi / (SETAE_PER_LAMELLA_Z - 1) - 0.5) * (LAMELLA_WIDTH - 1.6) + (Math.random() - 0.5) * 0.4;
-          const baseY = 1.15 + (Math.random() - 0.5) * 0.12;
-          const length = 5.5 + Math.random() * 8.4;
-          // aligned lean toward +Z direction slight angle
-          const lean = 0.22 + (Math.random() - 0.5) * 0.05; // uniform-ish
-          const twist = (Math.random() - 0.5) * 0.14;
-          setaeInfo.push({ x: localX, z: localZ, y: baseY, length, lean, twist });
-        }
-      }
-    }
-    // populate instanced mesh initial (collapsed)
-    const tmp = new THREE.Object3D();
-    for (let i = 0; i < setaeInfo.length; i++) {
-      const s = setaeInfo[i];
-      tmp.position.set(s.x, s.y, s.z);
-      tmp.rotation.set(-s.lean, s.twist, 0);
-      tmp.scale.set(1, 0.02, 1); // collapsed
-      tmp.updateMatrix();
-      setaeInst.setMatrixAt(i, tmp.matrix);
-    }
-    setaeInst.instanceMatrix.needsUpdate = true;
-
-    // ---------------------------
-    // Focused Seta Detail (one seta, splits to spatulae)
-    // ---------------------------
-    // choose center-most seta as focus
-    const focusIndex = Math.floor(setaeInfo.length / 2);
-    const DETAIL_SPAT_COUNT = 18; // number of spatulae for detail
-    const detailGroup = new THREE.Group(); // holds detailed shaft + spatulae
-    const detailShaftMat = new THREE.MeshStandardMaterial({ color: 0xffbd59, emissive: 0xffbd59, emissiveIntensity: 0.08, roughness: 0.5, transparent: true, opacity: 0.0 });
-    const detailTipMat = new THREE.MeshStandardMaterial({ color: 0xffd6a8, emissive: 0xffd6a8, emissiveIntensity: 0.12, roughness: 0.32, transparent: true, opacity: 0.0 });
-
-    const shaftGeom = new THREE.CylinderGeometry(0.08, 0.14, 18, 12, 1, true);
-    const shaftMesh = new THREE.Mesh(shaftGeom, detailShaftMat);
-    shaftMesh.visible = false;
-    detailGroup.add(shaftMesh);
-
-    // spatulae planes (fan)
-    const spatulaGeom = new THREE.PlaneGeometry(0.5, 0.22);
-    const spatulaMeshes = [];
-    for (let i = 0; i < DETAIL_SPAT_COUNT; i++) {
-      const m = new THREE.Mesh(spatulaGeom, detailTipMat);
-      m.visible = false;
-      m.material.side = THREE.DoubleSide;
-      detailGroup.add(m);
-      spatulaMeshes.push(m);
-    }
-    scene.add(detailGroup);
-
-    // ---------------------------
-    // Molecules (instanced)
-    // ---------------------------
-    const MOLE_COUNT = 72;
-    const molGeom = new THREE.SphereGeometry(0.18, 8, 8);
-    const molMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.35, roughness: 0.18, transparent: true, opacity: 0.0 });
-    const molInst = new THREE.InstancedMesh(molGeom, molMat, MOLE_COUNT);
-    molInst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    scene.add(molInst);
-    const molPositions = [];
-    const md = new THREE.Object3D();
-    for (let i = 0; i < MOLE_COUNT; i++) {
-      const rx = (Math.random() - 0.5) * 34;
-      const rz = (Math.random() - 0.5) * 34;
-      const ry = 14 + Math.random() * 7;
-      md.position.set(rx, ry, rz);
-      const s = 0.6 + Math.random() * 1.2;
-      md.scale.set(s, s, s);
-      md.updateMatrix();
-      molInst.setMatrixAt(i, md.matrix);
-      molPositions.push(new THREE.Vector3(rx, ry, rz));
-    }
-    molInst.instanceMatrix.needsUpdate = true;
-
-    // ---------------------------
-    // Force lines (subtle)
-    // ---------------------------
-    const LINKS = 40;
-    const posBuf = new Float32Array(LINKS * 2 * 3);
-    const colBuf = new Float32Array(LINKS * 2 * 3);
-    const lgeo = new THREE.BufferGeometry();
-    lgeo.setAttribute("position", new THREE.BufferAttribute(posBuf, 3));
-    lgeo.setAttribute("color", new THREE.BufferAttribute(colBuf, 3));
-    const lmat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.95 });
-    const forceLines = new THREE.LineSegments(lgeo, lmat);
-    forceLines.visible = false;
-    scene.add(forceLines);
-
-    const linkIndices = [];
-    for (let i = 0; i < LINKS; i++) linkIndices.push(Math.floor(i * (setaeInfo.length / LINKS)));
-
-    // ---------------------------
-    // UI references
-    // ---------------------------
-    const label = document.getElementById("zoomLabel");
-    const stageText = document.getElementById("stageText");
-    const stageBullet = document.getElementById("stageBullet");
-
-    function updateStageText(stage) {
-      if (stage === 0) {
-        label.textContent = "Gecko toe on surface";
-        stageText.textContent = "Macro view";
-        stageBullet.textContent = "Semi-realistic toe resting on a surface.";
-      } else if (stage === 1) {
-        label.textContent = "Lamellae & texture";
-        stageText.textContent = "Micro view";
-        stageBullet.textContent = "Lamellae ridges appear; setae prepare to grow.";
-      } else if (stage === 2) {
-        label.textContent = "Aligned setae field";
-        stageText.textContent = "Microscale setae";
-        stageBullet.textContent = "Dense aligned setae grow from lamellae (ordered brush).";
-      } else if (stage === 3) {
-        label.textContent = "Focused seta & spatulae";
-        stageText.textContent = "Nanoscale tip";
-        stageBullet.textContent = "Focused seta expands into spatulae fan for contact demonstration.";
-      } else {
-        label.textContent = "Molecular contact (1/r⁶)";
-        stageText.textContent = "Molecular";
-        stageBullet.textContent = "Molecules appear; force intensity visualized between spatula tips and molecules.";
-      }
-    }
-    updateStageText(0);
-
-    // helpers
-    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-    function smooth(x) { return x * x * (3 - 2 * x); }
-    function getProgress() { const sh = document.body.scrollHeight - window.innerHeight; if (sh <= 0) return 0; return clamp(window.scrollY / sh, 0, 1); }
-
-    // reusable objects
-    const tmpObj = new THREE.Object3D();
-    const quat = new THREE.Quaternion();
-    const up = new THREE.Vector3(0, 1, 0);
-
-    // animation
-    function animate() {
-      const p = getProgress();
-      // stages:
-      // 0: [0,0.2) macro
-      // 1: [0.2,0.42) lamellae
-      // 2: [0.42,0.72) setae growth
-      // 3: [0.72,0.88) focused seta -> spatulae
-      // 4: [0.88,1.0] molecules & forces
-      const s0 = 0.2, s1 = 0.42, s2 = 0.72, s3 = 0.88;
-
-      // camera interpolation
-      let camZ, camY;
-      if (p < s0) {
-        const t = smooth(clamp(p / s0, 0, 1));
-        camZ = THREE.MathUtils.lerp(START_Z, MID_Z, t * 0.35);
-        camY = THREE.MathUtils.lerp(28, 22, t * 0.6);
-        updateStageText(0);
-      } else if (p < s1) {
-        const t = smooth(clamp((p - s0) / (s1 - s0), 0, 1));
-        camZ = THREE.MathUtils.lerp(MID_Z, 40, t * 0.8);
-        camY = THREE.MathUtils.lerp(22, 18, t * 0.6);
-        updateStageText(1);
-      } else if (p < s2) {
-        const t = smooth(clamp((p - s1) / (s2 - s1), 0, 1));
-        camZ = THREE.MathUtils.lerp(40, 18, t);
-        camY = THREE.MathUtils.lerp(18, 14, t * 0.9);
-        updateStageText(2);
-      } else if (p < s3) {
-        const t = smooth(clamp((p - s2) / (s3 - s2), 0, 1));
-        camZ = THREE.MathUtils.lerp(18, 10, t);
-        camY = THREE.MathUtils.lerp(14, 11, t);
-        updateStageText(3);
-      } else {
-        const t = smooth(clamp((p - s3) / (1 - s3), 0, 1));
-        camZ = THREE.MathUtils.lerp(10, CLOSE_Z, t);
-        camY = THREE.MathUtils.lerp(11, 8, t);
-        updateStageText(4);
-      }
-
-      camera.position.lerp(new THREE.Vector3(0, camY, camZ), 0.12);
-      const focus = new THREE.Vector3(0, 8 + (1 - p) * 6, 0);
-      if (controls) controls.target.lerp(focus, 0.12);
-
-      // toe compress slightly into substrate as p increases
-      if (p > 0.03) {
-        const compress = clamp((p - 0.03) / 0.12, 0, 1);
-        toeGroup.position.lerp(new THREE.Vector3(-2 * compress, 10 - compress * 1.5, -0.6 * compress), 0.08);
-      }
-
-      // lamella appearance: fade lamellae in
-      const lamT = smooth(clamp((p - s0) / (s1 - s0), 0, 1));
-      lamellaeGroup.children.forEach((ch, i) => {
-        ch.material.opacity = THREE.MathUtils.lerp(0.0, 1.0, lamT);
-        ch.material.transparent = true;
-      });
-
-      // setae growth
-      const growT = smooth(clamp((p - s1) / (s2 - s1), 0, 1));
-      setaeMat.opacity = THREE.MathUtils.lerp(0.0, 0.95, growT);
-      for (let i = 0; i < setaeInfo.length; i++) {
-        const s = setaeInfo[i];
-        const finalLen = s.length;
-        const curLen = THREE.MathUtils.lerp(0.02, finalLen, growT);
-        // orientation: uniform lean toward +Z with small twist variance
-        const euler = new THREE.Euler(-s.lean, s.twist, 0, "XYZ");
-        quat.setFromEuler(euler);
-        const basePos = new THREE.Vector3(s.x, s.y, s.z);
-        tmpObj.position.copy(basePos).addScaledVector(new THREE.Vector3(0, 1, 0).applyQuaternion(quat), curLen / 2);
-        tmpObj.quaternion.copy(quat);
-        tmpObj.scale.set(1, curLen, 1);
-        tmpObj.updateMatrix();
-        setaeInst.setMatrixAt(i, tmpObj.matrix);
-      }
-      setaeInst.instanceMatrix.needsUpdate = true;
-
-      // prepare focused detail: compute the focused seta's tip & orientation
-      const focusInfo = setaeInfo[focusIndex];
-      const focusGrow = clamp(mapRange(p, s1, s3), 0, 1); // progress to detail grows across stages 2->3
-      // find current length for focused seta
-      const focusedCurLen = THREE.MathUtils.lerp(0.02, focusInfo.length, smooth(clamp((p - s1) / (s2 - s1), 0, 1)));
-      const focusEuler = new THREE.Euler(-focusInfo.lean, focusInfo.twist, 0, "XYZ");
-      const focusQuat = new THREE.Quaternion().setFromEuler(focusEuler);
-      const upVec = new THREE.Vector3(0, 1, 0).applyQuaternion(focusQuat).normalize();
-      const focusTip = new THREE.Vector3(focusInfo.x, focusInfo.y, focusInfo.z).addScaledVector(upVec, focusedCurLen).addScaledVector(upVec, 0.02);
-
-      // show/hide & position detailed shaft
-      if (p >= s2) {
-        shaftMesh.visible = true;
-        shaftMesh.material.opacity = THREE.MathUtils.lerp(0.0, 1.0, clamp((p - s2) / (s3 - s2), 0, 1));
-        // position shaft so user can see up-close: scale and place it centered at expected tip
-        shaftMesh.position.copy(focusTip.clone().addScaledVector(upVec, 9)); // center of long shaft
-        shaftMesh.quaternion.copy(focusQuat);
-        shaftMesh.scale.set(1.0, 1.0, 1.0);
-        // ensure detailGroup visibility
-        detailGroup.visible = true;
-      } else {
-        shaftMesh.visible = false;
-        detailGroup.visible = false;
-      }
-
-      // spatula fan around tip (only for focus and only late stage)
-      const spatProg = smooth(clamp((p - s2) / (s3 - s2), 0, 1));
-      for (let si = 0; si < spatulaMeshes.length; si++) {
-        const m = spatulaMeshes[si];
-        if (spatProg > 0.02) {
-          m.visible = true;
-          m.material.opacity = THREE.MathUtils.lerp(0.0, 1.0, spatProg);
-          // fan angle
-          const angle = (si / spatulaMeshes.length) * Math.PI * 1.8 - Math.PI * 0.9;
-          // place spatula around tip in a fan perpendicular-ish to seta axis
-          // compute two orthonormal vectors perpendicular to upVec
-          const tangent = new THREE.Vector3().crossVectors(upVec, new THREE.Vector3(0, 1, 0));
-          if (tangent.lengthSq() < 1e-6) tangent.set(1, 0, 0);
-          tangent.normalize();
-          const binormal = new THREE.Vector3().crossVectors(upVec, tangent).normalize();
-          // radial offset in local plane
-          const radius = 0.28 + (Math.sin(si * 1.3) * 0.03);
-          const localPos = focusTip.clone()
-            .addScaledVector(tangent, Math.cos(angle) * radius)
-            .addScaledVector(binormal, Math.sin(angle) * (radius * 0.6))
-            .addScaledVector(upVec, 0.01); // tiny lift to avoid z-fighting
-          m.position.copy(localPos);
-          // orient plane to face away from seta tip normal (so plane normal ~ upVec)
-          const planeNormal = new THREE.Vector3(0, 0, 1);
-          const spatQuat = new THREE.Quaternion().setFromUnitVectors(planeNormal, upVec);
-          // rotate around upVec to fan
-          const fanRot = new THREE.Quaternion().setFromAxisAngle(upVec, angle * 0.32);
-          spatQuat.multiply(fanRot);
-          m.quaternion.copy(spatQuat);
-          m.scale.set(0.9, 0.9, 1.0);
-        } else {
-          m.visible = false;
-        }
-      }
-
-      // molecules & force lines at deepest zoom
-      const molProg = smooth(clamp((p - s3) / (1 - s3), 0, 1));
-      molInst.instanceMatrix.needsUpdate = true;
-      molInst.count = MOLE_COUNT;
-      molInst.material.opacity = THREE.MathUtils.lerp(0.0, 1.0, molProg);
-
-      if (molProg > 0.02) {
-        forceLines.visible = true;
-        for (let li = 0; li < LINKS; li++) {
-          const idx = linkIndices[li];
-          const s = setaeInfo[idx];
-          // compute current tip for this seta (same as above)
-          const curLenIdx = THREE.MathUtils.lerp(0.02, s.length, smooth(clamp((p - s1) / (s2 - s1), 0, 1)));
-          const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-s.lean, s.twist, 0, "XYZ"));
-          const tip = new THREE.Vector3(s.x, s.y, s.z).addScaledVector(new THREE.Vector3(0, 1, 0).applyQuaternion(q), curLenIdx).addScaledVector(new THREE.Vector3(0, 1, 0).applyQuaternion(q), 0.02);
-
-          // find nearest molecule
-          let nearest = null; let nd = Infinity;
-          for (let mi = 0; mi < molPositions.length; mi++) {
-            const d2 = tip.distanceToSquared(molPositions[mi]);
-            if (d2 < nd) { nd = d2; nearest = molPositions[mi]; }
-          }
-          const r = Math.sqrt(nd) + 1e-6;
-          // use k/r^6 mapping with clamping; tuned k so values are moderate
-          let intensity = 200000 / Math.pow(r, 6);
-          intensity = clamp(intensity, 0, 1.2);
-          intensity *= molProg;
-
-          // write positions
-          posBuf[li * 6 + 0] = tip.x; posBuf[li * 6 + 1] = tip.y; posBuf[li * 6 + 2] = tip.z;
-          posBuf[li * 6 + 3] = nearest.x; posBuf[li * 6 + 4] = nearest.y; posBuf[li * 6 + 5] = nearest.z;
-
-          const base = [1.0, 0.78, 0.45];
-          colBuf[li * 6 + 0] = base[0] * clamp(0.2 + intensity, 0, 1.0);
-          colBuf[li * 6 + 1] = base[1] * clamp(0.2 + intensity * 0.9, 0, 1.0);
-          colBuf[li * 6 + 2] = base[2] * clamp(0.1 + intensity * 0.6, 0, 1.0);
-          colBuf[li * 6 + 3] = colBuf[li * 6 + 0] * 0.5; colBuf[li * 6 + 4] = colBuf[li * 6 + 1] * 0.5; colBuf[li * 6 + 5] = colBuf[li * 6 + 2] * 0.5;
-        }
-        lgeo.attributes.position.needsUpdate = true;
-        lgeo.attributes.color.needsUpdate = true;
-      } else {
-        forceLines.visible = false;
-      }
-
-      if (controls) controls.update();
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-
-    // small helper to map range
-    function mapRange(v, a, b) { if (b === a) return 0; return (v - a) / (b - a); }
-
-    // responsiveness
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    requestAnimationFrame(animate);
-
-    console.log("[SETAE] hierarchical build loaded. Scroll slowly and observe stages.");
-    // final note: if visual elements are too faint / too dense, adjust the knobs below (counts & sizes).
-  } catch (err) {
-    console.error("Error in setae.js:", err);
-    alert("setae.js error — see console.");
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight - 54;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── helpers ──────────────────────────────────────────
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(t) { return t * t * (3 - 2 * t); }
+
+  function getProgress() {
+    const max = document.body.scrollHeight - window.innerHeight;
+    if (max <= 0) return 0;
+    return clamp(window.scrollY / max, 0, 1);
+  }
+
+  function drawScaleBar(x, y, w, label) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x + w, y);
+    ctx.moveTo(x, y - 4); ctx.lineTo(x, y + 4);
+    ctx.moveTo(x + w, y - 4); ctx.lineTo(x + w, y + 4);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '11px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + w / 2, y - 9);
+    ctx.restore();
+  }
+
+  function label(text, x, y, color, bold) {
+    ctx.fillStyle = color || 'rgba(255,189,89,0.9)';
+    ctx.font = (bold ? 'bold ' : '') + '12px Segoe UI';
+    ctx.fillText(text, x, y);
+  }
+
+  function callout(x1, y1, x2, y2, text, subtext, color) {
+    color = color || 'rgba(255,189,89,0.5)';
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x2 + (x2 > x1 ? 36 : -36), y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const lx = x2 > x1 ? x2 + 40 : x2 - 40;
+    ctx.textAlign = x2 > x1 ? 'left' : 'right';
+    ctx.fillStyle = color.replace('0.5', '0.9');
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.fillText(text, lx, y2 - 4);
+    if (subtext) {
+      ctx.fillStyle = color.replace('0.5', '0.5');
+      ctx.font = '11px Segoe UI';
+      ctx.fillText(subtext, lx, y2 + 10);
+    }
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  // ── STAGE 0: Gecko Toe ───────────────────────────────
+  function drawStage0(p) {
+    const cx = W / 2, cy = H / 2;
+    const sp = smooth(p);
+
+    // Background
+    const bg = ctx.createRadialGradient(cx, cy * 0.8, 0, cx, cy, Math.max(W, H));
+    bg.addColorStop(0, '#0e1a10');
+    bg.addColorStop(1, '#0a0f14');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Surface
+    const surfY = cy + H * 0.2;
+    const sg = ctx.createLinearGradient(0, surfY, 0, H);
+    sg.addColorStop(0, 'rgba(90,130,170,0.28)');
+    sg.addColorStop(1, 'rgba(90,130,170,0.04)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, surfY, W, H - surfY);
+    ctx.strokeStyle = 'rgba(140,190,240,0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, surfY); ctx.lineTo(W, surfY); ctx.stroke();
+
+    // Toe shape
+    const tw = Math.min(W * 0.46, 260);
+    const th = Math.min(H * 0.42, 210);
+    const tx = cx - tw / 2;
+    const ty = surfY - th;
+
+    // Toe shadow
+    const shadowGrad = ctx.createRadialGradient(cx, surfY, 0, cx, surfY, tw * 0.6);
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
+    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadowGrad;
+    ctx.beginPath();
+    ctx.ellipse(cx, surfY + 6, tw * 0.45, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Toe body
+    const tg = ctx.createLinearGradient(tx, ty, tx + tw, ty + th);
+    tg.addColorStop(0, '#2e2018');
+    tg.addColorStop(0.5, '#1e1610');
+    tg.addColorStop(1, '#0f0c08');
+    ctx.beginPath();
+    ctx.moveTo(tx + tw * 0.15, ty + 2);
+    ctx.bezierCurveTo(cx - tw * 0.05, ty - th * 0.08, cx + tw * 0.05, ty - th * 0.08, tx + tw * 0.85, ty + 2);
+    ctx.bezierCurveTo(tx + tw * 1.04, ty + th * 0.32, tx + tw * 1.0, ty + th * 0.75, tx + tw * 0.94, surfY - 1);
+    ctx.lineTo(tx + tw * 0.06, surfY - 1);
+    ctx.bezierCurveTo(tx, ty + th * 0.75, tx - tw * 0.04, ty + th * 0.32, tx + tw * 0.15, ty + 2);
+    ctx.fillStyle = tg;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Toe pad (setae area)
+    const padH = 20;
+    const pg = ctx.createLinearGradient(0, surfY - padH, 0, surfY);
+    pg.addColorStop(0, 'rgba(255,189,89,0.06)');
+    pg.addColorStop(1, 'rgba(255,189,89,0.22)');
+    ctx.beginPath();
+    ctx.roundRect(tx + tw * 0.07, surfY - padH, tw * 0.86, padH, [4, 4, 0, 0]);
+    ctx.fillStyle = pg;
+    ctx.fill();
+
+    // Ridges on toe pad
+    ctx.strokeStyle = 'rgba(255,189,89,0.18)';
+    ctx.lineWidth = 0.8;
+    for (let i = 1; i < 8; i++) {
+      const lx = tx + tw * 0.07 + (tw * 0.86 / 8) * i;
+      ctx.beginPath(); ctx.moveTo(lx, surfY - padH); ctx.lineTo(lx, surfY); ctx.stroke();
+    }
+
+    // Labels
+    ctx.globalAlpha = sp;
+    callout(tx + tw * 0.93, surfY - 10, tx + tw * 1.08, surfY - 50, 'Setae pad', '~200,000 setae/toe');
+    callout(cx, ty + 30, cx - tw * 0.5, ty - 20, 'Gecko toe', null, 'rgba(180,160,140,0.5)');
+
+    ctx.fillStyle = 'rgba(140,190,240,0.4)';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText('Glass surface', W * 0.04, surfY + 22);
+    ctx.globalAlpha = 1;
+
+    drawScaleBar(W - 130, H - 36, 70, '~1 cm');
+
+    if (p < 0.6) {
+      ctx.globalAlpha = (1 - p / 0.6) * 0.55;
+      ctx.fillStyle = 'rgba(255,189,89,0.6)';
+      ctx.font = '11px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText('↓  scroll to zoom in', W / 2, H - 22);
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // ── STAGE 1: Lamellae ────────────────────────────────
+  function drawStage1(p) {
+    const cx = W / 2, cy = H / 2;
+    const sp = smooth(p);
+
+    // Background — inside toe pad
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#181008');
+    bg.addColorStop(1, '#0a0c0e');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const n = 7;
+    const lH = Math.min(H * 0.074, 42);
+    const gap = Math.min(H * 0.055, 30);
+    const total = n * (lH + gap) - gap;
+    const sy = cy - total / 2;
+    const lW = Math.min(W * 0.8, 540);
+    const lX = cx - lW / 2;
+
+    for (let i = 0; i < n; i++) {
+      const y = sy + i * (lH + gap);
+      const fade = clamp(sp * 2.2 - i * 0.08, 0, 1);
+
+      // Ridge shape
+      const rg = ctx.createLinearGradient(lX, y, lX, y + lH);
+      rg.addColorStop(0, `rgba(255,189,89,${0.42 * fade})`);
+      rg.addColorStop(0.35, `rgba(255,189,89,${0.2 * fade})`);
+      rg.addColorStop(1, `rgba(255,189,89,${0.04 * fade})`);
+
+      ctx.beginPath();
+      ctx.moveTo(lX, y + lH * 0.5);
+      ctx.bezierCurveTo(lX + lW * 0.08, y, lX + lW * 0.92, y, lX + lW, y + lH * 0.5);
+      ctx.bezierCurveTo(lX + lW * 0.92, y + lH, lX + lW * 0.08, y + lH, lX, y + lH * 0.5);
+      ctx.fillStyle = rg;
+      ctx.fill();
+
+      // Ridge highlight top edge
+      ctx.beginPath();
+      ctx.moveTo(lX, y + lH * 0.5);
+      ctx.bezierCurveTo(lX + lW * 0.08, y, lX + lW * 0.92, y, lX + lW, y + lH * 0.5);
+      ctx.strokeStyle = `rgba(255,220,140,${0.45 * fade})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Tiny setae hint at later progress
+      if (p > 0.35) {
+        const sAlpha = clamp((p - 0.35) / 0.4, 0, 1) * fade * 0.55;
+        ctx.strokeStyle = `rgba(255,189,89,${sAlpha})`;
+        ctx.lineWidth = 0.6;
+        const sc = 32;
+        for (let s = 0; s < sc; s++) {
+          const sx = lX + (lW / sc) * s + lW / sc / 2;
+          const baseY = y + lH * 0.12;
+          const h = 7 + Math.sin(s * 1.1 + i * 0.7) * 2;
+          const lean = Math.sin(s * 0.9) * 1.5;
+          ctx.beginPath(); ctx.moveTo(sx, baseY); ctx.lineTo(sx + lean, baseY - h); ctx.stroke();
+        }
+      }
+    }
+
+    // Labels
+    ctx.globalAlpha = smooth(p);
+    callout(lX + lW, sy + 2 * (lH + gap) + lH / 2, lX + lW + 20, sy + 1 * (lH + gap), 'Lamella', '~500 μm wide');
+    ctx.fillStyle = 'rgba(255,189,89,0.3)';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText(`${n} lamellae visible`, W * 0.04, sy - 16);
+    ctx.globalAlpha = 1;
+
+    drawScaleBar(W - 130, H - 36, 80, '~500 μm');
+  }
+
+  // ── STAGE 2: Setae Field ─────────────────────────────
+  function drawStage2(p) {
+    const cx = W / 2, cy = H / 2;
+    const sp = smooth(p);
+
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#0e180f');
+    bg.addColorStop(1, '#060c08');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const baseY = cy + H * 0.22;
+
+    // Lamella surface
+    const sg = ctx.createLinearGradient(0, baseY, 0, H);
+    sg.addColorStop(0, 'rgba(255,189,89,0.16)');
+    sg.addColorStop(1, 'rgba(255,189,89,0.03)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, baseY, W, H - baseY);
+    ctx.strokeStyle = 'rgba(255,189,89,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(W, baseY); ctx.stroke();
+
+    // Dense setae
+    const colW = 16;
+    const cols = Math.ceil(W / colW);
+    const rows = 7;
+    const rSpacing = Math.min(H * 0.055, 28);
+
+    for (let row = 0; row < rows; row++) {
+      const rowFade = clamp(sp * 2.0 - row * 0.15, 0, 1);
+      if (rowFade <= 0) continue;
+      const maxH = (14 + row * 5);
+
+      for (let col = 0; col < cols; col++) {
+        const x = col * colW + (row % 2) * (colW / 2);
+        const by = baseY - row * rSpacing;
+        const h = (maxH * (0.7 + Math.sin(col * 1.4 + row * 0.9) * 0.3)) * rowFade;
+        const lean = Math.sin(col * 0.65 + row * 0.5) * 3;
+        const alpha = (0.35 + rowFade * 0.45 + (rows - row) / rows * 0.1);
+
+        ctx.strokeStyle = `rgba(255,189,89,${alpha})`;
+        ctx.lineWidth = 0.8 + row * 0.08;
+        ctx.beginPath();
+        ctx.moveTo(x, by);
+        ctx.quadraticCurveTo(x + lean * 0.4, by - h * 0.5, x + lean, by - h);
+        ctx.stroke();
+
+        // Tip dot for top rows
+        if (row >= rows - 2 && rowFade > 0.6) {
+          ctx.fillStyle = `rgba(255,220,140,${(rowFade - 0.6) * 2 * 0.6})`;
+          ctx.beginPath();
+          ctx.arc(x + lean, by - h, 1.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // Labels
+    ctx.globalAlpha = smooth(p);
+    callout(W / 2, baseY - 55, W / 2 + W * 0.18, baseY - 100, 'Seta', '~100 μm tall');
+    ctx.fillStyle = 'rgba(255,189,89,0.35)';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText('~1,000 setae per lamella', W * 0.04, baseY - 14);
+    ctx.fillStyle = 'rgba(255,189,89,0.25)';
+    ctx.fillText('Lamella surface', W * 0.04, baseY + 22);
+    ctx.globalAlpha = 1;
+
+    drawScaleBar(W - 130, H - 36, 60, '~100 μm');
+  }
+
+  // ── STAGE 3: Spatulae ────────────────────────────────
+  function drawStage3(p, time) {
+    const cx = W / 2, cy = H / 2;
+    const sp = smooth(p);
+
+    ctx.fillStyle = '#04080e';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle radial
+    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.6);
+    bg.addColorStop(0, 'rgba(255,189,89,0.025)');
+    bg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const surfY = cy + H * 0.28;
+
+    // Surface
+    const sg = ctx.createLinearGradient(0, surfY, 0, H);
+    sg.addColorStop(0, 'rgba(100,160,230,0.22)');
+    sg.addColorStop(1, 'rgba(100,160,230,0.04)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, surfY, W, H - surfY);
+    ctx.strokeStyle = 'rgba(120,175,245,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, surfY); ctx.lineTo(W, surfY); ctx.stroke();
+
+    // Surface molecule hints
+    if (p > 0.3) {
+      const mAlpha = clamp((p - 0.3) / 0.5, 0, 1) * 0.45;
+      const mSpacing = 26;
+      for (let mx = mSpacing / 2; mx < W; mx += mSpacing) {
+        const jy = Math.sin(mx * 0.22) * 4;
+        const mg = ctx.createRadialGradient(mx, surfY + 7 + jy, 0, mx, surfY + 7 + jy, 6);
+        mg.addColorStop(0, `rgba(160,210,255,${mAlpha})`);
+        mg.addColorStop(1, 'rgba(100,160,240,0)');
+        ctx.fillStyle = mg;
+        ctx.beginPath(); ctx.arc(mx, surfY + 7 + jy, 6, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Seta shaft
+    const topY = cy - H * 0.34;
+    const botY = surfY - 32;
+    const sw = Math.max(5, 14 - sp * 4);
+
+    const shaftG = ctx.createLinearGradient(cx - sw, topY, cx + sw, topY);
+    shaftG.addColorStop(0, 'rgba(255,189,89,0.28)');
+    shaftG.addColorStop(0.5, 'rgba(255,189,89,0.82)');
+    shaftG.addColorStop(1, 'rgba(255,189,89,0.28)');
+
+    ctx.beginPath();
+    ctx.moveTo(cx - sw / 2, topY);
+    ctx.lineTo(cx + sw / 2, topY);
+    ctx.bezierCurveTo(cx + sw / 2 + 3, cy - 20, cx + sw / 3, botY - 20, cx + 1, botY);
+    ctx.bezierCurveTo(cx - sw / 3, botY - 20, cx - sw / 2 - 3, cy - 20, cx - sw / 2, topY);
+    ctx.fillStyle = shaftG;
+    ctx.fill();
+
+    // Tapering highlight
+    ctx.strokeStyle = 'rgba(255,220,140,0.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - sw / 2, topY);
+    ctx.bezierCurveTo(cx - sw / 2 - 3, cy - 20, cx - sw / 3, botY - 20, cx - 1, botY);
+    ctx.stroke();
+
+    // Spatulae fan
+    const numS = 26;
+    const spread = Math.min(W * 0.3, 170) * sp;
+    const fanDrop = 30 * sp;
+
+    for (let i = 0; i < numS; i++) {
+      const t = i / (numS - 1);
+      const angle = (t - 0.5) * Math.PI * 0.88;
+      const tipX = cx + Math.sin(angle) * spread;
+      const tipY = botY + Math.cos(angle) * 10 + fanDrop * (1 - Math.cos(angle * 2));
+      const alpha = (0.45 + (1 - Math.abs(t - 0.5) * 1.8) * 0.45) * sp;
+
+      // Branch
+      ctx.strokeStyle = `rgba(255,189,89,${alpha * 0.85})`;
+      ctx.lineWidth = 0.9 + (1 - Math.abs(t - 0.5) * 1.6) * 1.4;
+      ctx.beginPath();
+      ctx.moveTo(cx, botY);
+      ctx.quadraticCurveTo(cx + Math.sin(angle) * spread * 0.5, botY, tipX, tipY);
+      ctx.stroke();
+
+      // Spatula pad
+      if (sp > 0.25) {
+        const pAlpha = clamp((sp - 0.25) / 0.5, 0, 1) * alpha;
+        const padW = 11 * pAlpha;
+        const padH = 5 * pAlpha;
+        const padDist = 18 * sp;
+
+        ctx.save();
+        ctx.translate(tipX, tipY + padDist);
+        ctx.rotate(angle * 0.3);
+        const pg = ctx.createLinearGradient(-padW / 2, 0, padW / 2, 0);
+        pg.addColorStop(0, `rgba(255,200,100,${pAlpha * 0.3})`);
+        pg.addColorStop(0.5, `rgba(255,215,130,${pAlpha * 0.95})`);
+        pg.addColorStop(1, `rgba(255,200,100,${pAlpha * 0.3})`);
+        ctx.fillStyle = pg;
+        ctx.beginPath(); ctx.ellipse(0, 0, padW / 2, padH / 2, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Labels
+    ctx.globalAlpha = smooth(p);
+    callout(cx + sw / 2, topY + 20, cx + W * 0.22, topY + 40, 'Seta shaft', null, 'rgba(255,189,89,0.5)');
+
+    if (sp > 0.3) {
+      const la = clamp((sp - 0.3) / 0.4, 0, 1);
+      ctx.globalAlpha = la;
+      callout(cx + spread * 0.85, botY + fanDrop, cx + spread + 10, botY + fanDrop - 10, 'Spatula pads', '~200 nm', 'rgba(255,210,130,0.5)');
+    }
+
+    ctx.globalAlpha = smooth(p);
+    ctx.fillStyle = 'rgba(120,175,245,0.45)';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText('Surface', W * 0.04, surfY + 22);
+    ctx.globalAlpha = 1;
+
+    drawScaleBar(W - 130, H - 36, 55, '~1 μm');
+  }
+
+  // ── STAGE 4: Van der Waals ───────────────────────────
+  function drawStage4(p, time) {
+    const cx = W / 2, cy = H / 2;
+    const sp = smooth(p);
+
+    ctx.fillStyle = '#030609';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle glow center
+    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.55);
+    bg.addColorStop(0, 'rgba(80,140,200,0.07)');
+    bg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Gap closes as p increases
+    const maxGap = H * 0.2;
+    const minGap = H * 0.06;
+    const gap = lerp(maxGap, minGap, sp);
+    const upperY = cy - gap / 2;
+    const lowerY = cy + gap / 2;
+
+    const molR = Math.min(W, H) * 0.026;
+    const mSpacing = molR * 2.7;
+    const cols = Math.ceil(W / mSpacing) + 2;
+
+    // Force lines
+    if (sp > 0.15) {
+      const fAlpha = clamp((sp - 0.15) / 0.5, 0, 1);
+      const waveAmp = lerp(8, 2, sp);
+
+      for (let i = 0; i < cols; i++) {
+        const mx = (i - 0.5) * mSpacing + mSpacing * 0.3;
+        const jitter = Math.sin(mx * 0.18 + 1.2) * molR * 0.3;
+
+        const r = lowerY - upperY;
+        const forceMag = clamp(0.4 / Math.pow(r / (H * 0.08), 2), 0, 1);
+        const intensity = forceMag * fAlpha;
+
+        const fg = ctx.createLinearGradient(mx, upperY, mx, lowerY);
+        fg.addColorStop(0, `rgba(255,189,89,0)`);
+        fg.addColorStop(0.25, `rgba(255,189,89,${intensity * 0.8})`);
+        fg.addColorStop(0.5, `rgba(100,230,190,${intensity})`);
+        fg.addColorStop(0.75, `rgba(130,190,255,${intensity * 0.8})`);
+        fg.addColorStop(1, `rgba(130,190,255,0)`);
+
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = 1.2 + forceMag * 2;
+        ctx.beginPath();
+        let first = true;
+        for (let y = upperY + jitter; y <= lowerY - jitter; y += 2) {
+          const xOff = Math.sin(y * 0.09 + time * 2.2 + i * 0.8) * waveAmp;
+          if (first) { ctx.moveTo(mx + xOff, y); first = false; }
+          else ctx.lineTo(mx + xOff, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    // Upper molecules (spatula)
+    for (let i = 0; i < cols; i++) {
+      const mx = (i - 0.5) * mSpacing + mSpacing * 0.3;
+      const jy = Math.sin(mx * 0.14 + 0.5) * molR * 0.35;
+      const bob = Math.sin(time * 1.1 + i * 0.7) * molR * 0.2 * (1 - sp * 0.8);
+      const y = upperY + jy + bob;
+
+      const mg = ctx.createRadialGradient(mx, y, 0, mx, y, molR * 1.1);
+      mg.addColorStop(0, `rgba(255,225,150,${0.7 + sp * 0.2})`);
+      mg.addColorStop(0.5, `rgba(255,180,60,${0.55 + sp * 0.15})`);
+      mg.addColorStop(1, 'rgba(255,140,30,0)');
+      ctx.fillStyle = mg;
+      ctx.beginPath(); ctx.arc(mx, y, molR * 1.05, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Lower molecules (surface)
+    for (let i = 0; i < cols; i++) {
+      const mx = (i - 0.28) * mSpacing + mSpacing * 0.5;
+      const jy = Math.cos(mx * 0.12 + 0.8) * molR * 0.3;
+      const y = lowerY + jy;
+
+      const mg = ctx.createRadialGradient(mx, y, 0, mx, y, molR * 1.1);
+      mg.addColorStop(0, 'rgba(190,225,255,0.82)');
+      mg.addColorStop(0.5, 'rgba(100,165,245,0.55)');
+      mg.addColorStop(1, 'rgba(60,120,230,0)');
+      ctx.fillStyle = mg;
+      ctx.beginPath(); ctx.arc(mx, y, molR, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Distance label
+    if (sp > 0.25) {
+      const dAlpha = clamp((sp - 0.25) / 0.45, 0, 1);
+      ctx.globalAlpha = dAlpha * 0.8;
+      const dX = W * 0.8;
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(dX, upperY); ctx.lineTo(dX, lowerY); ctx.stroke();
+      ctx.setLineDash([]);
+      const dist = lerp(0.8, 0.4, sp).toFixed(1);
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.font = 'bold 11px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${dist} nm`, dX, (upperY + lowerY) / 2 + 4);
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = 1;
+    }
+
+    // Labels
+    ctx.globalAlpha = smooth(p);
+    ctx.fillStyle = 'rgba(255,210,130,0.85)';
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.fillText('Spatula molecules', W * 0.04, upperY - 16);
+    ctx.fillStyle = 'rgba(150,200,255,0.85)';
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.fillText('Surface molecules', W * 0.04, lowerY + 30);
+
+    // Equation box
+    if (sp > 0.45) {
+      const eqAlpha = clamp((sp - 0.45) / 0.4, 0, 1);
+      ctx.globalAlpha = eqAlpha;
+      const eqX = W * 0.04, eqY = H - 80;
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.strokeStyle = 'rgba(255,189,89,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(eqX, eqY, 210, 56, 10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,189,89,0.95)';
+      ctx.font = 'bold 14px Segoe UI';
+      ctx.fillText('F  ∝  1 / r⁶', eqX + 16, eqY + 22);
+      ctx.fillStyle = 'rgba(255,189,89,0.5)';
+      ctx.font = '11px Segoe UI';
+      ctx.fillText('Van der Waals force law', eqX + 16, eqY + 40);
+    }
+
+    ctx.globalAlpha = 1;
+    drawScaleBar(W - 130, H - 36, 45, '~0.5 nm');
+  }
+
+  // ── RENDER LOOP ──────────────────────────────────────
+  const STAGE_FUNCS = [drawStage0, drawStage1, drawStage2, drawStage3, drawStage4];
+  const NUM_STAGES = 5;
+  const STAGE_INFO = [
+    { title: 'Gecko Toe', desc: 'Macro view — the toe pad resting on a glass surface (~1 cm)' },
+    { title: 'Lamellae', desc: 'Zooming in — parallel ridges called lamellae organize the setae (~500 μm wide)' },
+    { title: 'Setae Field', desc: 'Microscale — thousands of hair-like setae emerge from each lamella (~100 μm tall)' },
+    { title: 'Spatulae', desc: 'A single seta tip fans into ~1,000 spatula pads that contact the surface (~200 nm)' },
+    { title: 'Van der Waals Forces', desc: 'Molecules attract across 0.3–0.6 nm — no glue, no suction, just physics' },
+  ];
+
+  const dots = document.querySelectorAll('.stage-dot');
+  const titleEl = document.getElementById('stage-title');
+  const descEl = document.getElementById('stage-desc');
+  const progressBar = document.getElementById('progress-bar');
+
+  let smoothP = 0;
+  let time = 0;
+  let lastStageIdx = -1;
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const si = parseInt(dot.dataset.stage);
+      const max = document.body.scrollHeight - window.innerHeight;
+      const target = ((si + 0.05) / NUM_STAGES) * max;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    });
+  });
+
+  function render() {
+    const rawP = getProgress();
+    smoothP = lerp(smoothP, rawP, 0.07);
+
+    const stageF = smoothP * NUM_STAGES;
+    const si = clamp(Math.floor(stageF), 0, NUM_STAGES - 1);
+    const sp = clamp(stageF - si, 0, 1);
+
+    // Update UI
+    if (si !== lastStageIdx) {
+      lastStageIdx = si;
+      titleEl.textContent = STAGE_INFO[si].title;
+      descEl.textContent = STAGE_INFO[si].desc;
+      dots.forEach((d, i) => d.classList.toggle('active', i === si));
+    }
+
+    progressBar.style.width = (rawP * 100) + '%';
+
+    // Clear
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw current stage
+    if (si === 3 || si === 4) {
+      STAGE_FUNCS[si](sp, time);
+    } else {
+      STAGE_FUNCS[si](sp);
+    }
+
+    // Fade-to-black transition at stage boundaries
+    if (sp > 0.85 && si < NUM_STAGES - 1) {
+      const blend = smooth((sp - 0.85) / 0.15);
+      ctx.globalAlpha = blend;
+      ctx.fillStyle = '#0a0f14';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
+
+    time += 0.016;
+    requestAnimationFrame(render);
+  }
+
+  render();
 });
