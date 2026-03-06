@@ -2,197 +2,216 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Simulation</title>
     <link rel="stylesheet" href="css/style.css">
-
     <style>
-        .main-content.sim-page {
-            max-width: 1280px;
-            padding-top: 5rem;
-        }
-
+        .main-content { max-width: 1280px; }
         .sim-wrapper {
             display: grid;
-            grid-template-columns: minmax(300px, 380px) minmax(420px, 1fr);
+            grid-template-columns: minmax(300px, 390px) minmax(420px, 1fr);
             gap: 1.6rem;
             align-items: stretch;
         }
-
-        .sim-controls,
-        .sim-visual {
+        .sim-controls, .sim-visual {
             background: linear-gradient(145deg, #131c26, #111820);
-            border: 1px solid rgba(255, 189, 89, 0.18);
+            border: 1px solid rgba(255,189,89,0.18);
             border-radius: 16px;
         }
-
-        .sim-controls {
-            padding: 1.4rem;
-        }
-
+        .sim-controls { padding: 1.4rem; }
         .sim-controls h2 {
             color: var(--accent);
-            font-size: 1.12rem;
-            margin-bottom: 1rem;
+            font-size: 0.78rem;
+            margin-bottom: 0.7rem;
+            margin-top: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
-
-        .section {
-            margin-bottom: 1rem;
-        }
-
-        .section label {
-            display: block;
-            margin-bottom: 0.45rem;
+        .sim-controls h2:first-child { margin-top: 0; }
+        .section { margin-bottom: 0.9rem; }
+        .section label { display: block; margin-bottom: 0.38rem; color: var(--text-muted); font-size: 0.86rem; }
+        .adhesive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.42rem; }
+        .adh-btn {
+            padding: 0.5rem 0.25rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
             color: var(--text-muted);
-            font-size: 0.92rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.78rem;
+            text-align: center;
+            line-height: 1.3;
+            user-select: none;
         }
-
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 0.55rem 0.6rem;
+        .adh-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .adh-btn.active { border-color: var(--accent); background: rgba(255,189,89,0.12); color: var(--accent); font-weight: 600; }
+        .adh-icon { font-size: 1.15rem; display: block; margin-bottom: 0.12rem; }
+        .adh-sigma { font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 0.08rem; }
+        .adh-btn.active .adh-sigma { color: rgba(255,189,89,0.55); }
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+        .preset-btn {
+            padding: 0.52rem 0.35rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        .preset-btn:hover { border-color: var(--accent); }
+        .preset-btn.active { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+        .gravity-manual {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .gravity-manual input[type="number"] {
+            width: 90px;
+            padding: 0.48rem 0.5rem;
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.14);
             background: #0f1a22;
             color: var(--text-primary);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent);
-        }
-
-        .preset-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.55rem;
-        }
-
-        .preset-btn {
-            padding: 0.6rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.14);
-            background: transparent;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: 0.25s ease;
             font-size: 0.86rem;
         }
-
-        .preset-btn:hover {
-            border-color: var(--accent);
+        .gravity-manual span { font-size: 0.82rem; color: var(--text-muted); }
+        .warning-banner {
+            display: none;
+            margin-top: 0.55rem;
+            padding: 0.5rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(248,113,113,0.08);
+            border: 1px solid rgba(248,113,113,0.3);
+            color: #f87171;
+            font-size: 0.8rem;
+            line-height: 1.45;
         }
-
-        .preset-btn.active {
-            background: var(--accent);
-            color: #111;
-            border-color: var(--accent);
-            font-weight: 600;
-        }
-
+        .warning-banner.visible { display: block; }
         .results-box {
-            margin-top: 1rem;
-            padding: 0.9rem;
+            margin-top: 0.9rem;
+            padding: 0.85rem;
             border-radius: 12px;
             background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.07);
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            font-size: 0.85rem;
-            line-height: 1.65;
+            font-size: 0.81rem;
+            line-height: 1.85;
         }
-
-        .status-label {
-            font-weight: 700;
-            letter-spacing: 0.04em;
+        .res-row { display: flex; justify-content: space-between; }
+        .res-val { color: var(--accent); font-weight: 600; }
+        .max-load-row {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.78rem;
+            color: var(--text-muted);
         }
-
-        .sim-visual {
-            min-height: 560px;
-            padding: 0.7rem;
-        }
-
-        #simCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            border-radius: 12px;
-            background: linear-gradient(180deg, #0d1720, #0b141c);
-        }
-
-        @media (max-width: 1040px) {
-            .sim-wrapper {
-                grid-template-columns: 1fr;
-            }
-
-            .sim-visual {
-                min-height: 460px;
-            }
-        }
+        .max-load-row strong { color: var(--text-primary); }
+        .sim-visual { min-height: 560px; padding: 0.7rem; }
+        #simCanvas { width: 100%; height: 100%; display: block; border-radius: 12px; background: linear-gradient(180deg,#0d1720,#0b141c); }
+        @media(max-width:1040px){ .sim-wrapper{grid-template-columns:1fr;} .sim-visual{min-height:400px;} }
+        @media(max-width:600px){ .adhesive-grid{grid-template-columns:1fr 1fr;} }
     </style>
 </head>
 <body>
-
 <script src="js/layout.js"></script>
-
 <script>
-document.querySelector(".main-content").classList.add("sim-page");
 document.getElementById("page-content").innerHTML = `
-    <h1>Gecko Adhesion Load Simulation</h1>
+<h1>Adhesive Load Simulation</h1>
+<p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.6rem;max-width:640px;">
+  Compare five adhesive technologies under real loads. σ values sourced from peer-reviewed literature.
+  Toggle the adhesive type, adjust mass and gravity, and see what holds.
+</p>
 
-    <div class="sim-wrapper">
-        <div class="sim-controls">
-            <h2>Input Controls</h2>
+<div class="sim-wrapper">
+  <div class="sim-controls">
 
-            <div class="section">
-                <label>Weight presets</label>
-                <div class="preset-grid">
-                    <button class="preset-btn" data-mass="0.18">Phone — 0.18 kg</button>
-                    <button class="preset-btn" data-mass="2">Laptop — 2 kg</button>
-                    <button class="preset-btn active" data-mass="8">Backpack — 8 kg</button>
-                    <button class="preset-btn" data-mass="70">Person — 70 kg</button>
-                </div>
-            </div>
-
-            <div class="section">
-                <label for="massInput">Manual mass (kg)</label>
-                <input id="massInput" type="number" value="8" min="0.01" step="0.1">
-            </div>
-
-            <div class="section">
-                <label for="gravitySelect">Gravity preset</label>
-                <select id="gravitySelect">
-                    <option value="9.81">Earth — 9.81 m/s²</option>
-                    <option value="3.71">Mars — 3.71 m/s²</option>
-                    <option value="1.62">Moon — 1.62 m/s²</option>
-                    <option value="0.1">ISS — 0.1 m/s²</option>
-                </select>
-            </div>
-
-            <div class="section">
-                <label for="areaSlider">Contact area: <span id="areaValue">10</span> cm²</label>
-                <input id="areaSlider" type="range" min="1" max="100" value="10">
-            </div>
-
-            <div class="section">
-                <label for="efficiencySlider">Surface efficiency η: <span id="efficiencyValue">0.90</span></label>
-                <input id="efficiencySlider" type="range" min="0.1" max="1" step="0.05" value="0.9">
-            </div>
-
-            <div class="results-box">
-                Adhesive Force: <span id="adhesiveForce">--</span><br>
-                Weight Force: <span id="weightForce">--</span><br>
-                Safety Factor: <span id="safetyFactor">--</span><br>
-                Status: <span id="statusLabel" class="status-label">--</span>
-            </div>
-        </div>
-
-        <div class="sim-visual">
-            <canvas id="simCanvas"></canvas>
-        </div>
+    <h2>Adhesive Type</h2>
+    <div class="section">
+      <div class="adhesive-grid" id="adhesiveGrid">
+        <button class="adh-btn active" data-type="gecko">
+          <span class="adh-icon">🦎</span>Gecko Tape<span class="adh-sigma">σ = 100 kPa</span>
+        </button>
+        <button class="adh-btn" data-type="tape">
+          <span class="adh-icon">📼</span>Normal Tape<span class="adh-sigma">σ = 30 kPa</span>
+        </button>
+        <button class="adh-btn" data-type="velcro">
+          <span class="adh-icon">🪡</span>Velcro<span class="adh-sigma">σ = 60 kPa</span>
+        </button>
+        <button class="adh-btn" data-type="glue">
+          <span class="adh-icon">🔵</span>Super Glue<span class="adh-sigma">σ = 1.5 MPa</span>
+        </button>
+        <button class="adh-btn" data-type="suction">
+          <span class="adh-icon">🫧</span>Suction Cup<span class="adh-sigma">σ ≤ 70 kPa</span>
+        </button>
+      </div>
+      <div class="warning-banner" id="warningBanner"></div>
     </div>
+
+    <h2>Mass</h2>
+    <div class="section">
+      <label>Presets</label>
+      <div class="preset-grid">
+        <button class="preset-btn" data-mass="0.18">📱 Phone 0.18 kg</button>
+        <button class="preset-btn" data-mass="2">💻 Laptop 2 kg</button>
+        <button class="preset-btn active" data-mass="8">🎒 Backpack 8 kg</button>
+        <button class="preset-btn" data-mass="70">🧍 Person 70 kg</button>
+      </div>
+    </div>
+    <div class="section">
+      <label for="massInput">Manual mass (kg)</label>
+      <input id="massInput" type="number" value="8" min="0.01" max="99999" step="0.1">
+    </div>
+
+    <h2>Gravity</h2>
+    <div class="section">
+      <label>Presets</label>
+      <div class="preset-grid">
+        <button class="preset-btn preset-g active" data-g="9.81">🌍 Earth 9.81</button>
+        <button class="preset-btn preset-g" data-g="3.71">🔴 Mars 3.71</button>
+        <button class="preset-btn preset-g" data-g="1.62">🌕 Moon 1.62</button>
+        <button class="preset-btn preset-g" data-g="0.001">🛸 ISS ~0</button>
+      </div>
+    </div>
+    <div class="section">
+      <label>Manual gravity (m/s²)</label>
+      <div class="gravity-manual">
+        <input id="gravityInput" type="number" value="9.81" min="0" max="30" step="0.01">
+        <span>m/s²</span>
+      </div>
+    </div>
+
+    <h2>Contact Parameters</h2>
+    <div class="section">
+      <label for="areaSlider">Contact area: <span id="areaValue">10</span> cm²</label>
+      <input id="areaSlider" type="range" min="1" max="200" value="10">
+    </div>
+    <div class="section">
+      <label for="efficiencySlider">Surface efficiency η: <span id="efficiencyValue">0.90</span></label>
+      <input id="efficiencySlider" type="range" min="0.05" max="1" step="0.05" value="0.9">
+    </div>
+
+    <div class="results-box">
+      <div class="res-row"><span>Adhesive Force</span><span class="res-val" id="adhesiveForce">--</span></div>
+      <div class="res-row"><span>Weight Force</span><span class="res-val" id="weightForce">--</span></div>
+      <div class="res-row"><span>Safety Factor</span><span class="res-val" id="safetyFactor">--</span></div>
+      <div class="res-row"><span>Status</span><span class="res-val" id="statusLabel">--</span></div>
+      <div class="max-load-row">
+        Max mass @ current area &amp; η:<br>
+        <strong id="maxLoad">--</strong>
+      </div>
+    </div>
+
+  </div>
+  <div class="sim-visual">
+    <canvas id="simCanvas"></canvas>
+  </div>
+</div>
 `;
 </script>
-
 <script src="js/simulation.js"></script>
-
 </body>
 </html>
