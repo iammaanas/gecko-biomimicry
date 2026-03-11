@@ -18,10 +18,10 @@
 
   pageContent.innerHTML = `
     <h1>Gecko Foot Hierarchical Zoom Model</h1>
-    <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1rem;">
-      Explore how gecko feet stick to walls by zooming from a full footpad view down through lamellae,
-      microscopic setae, and finally nanoscopic spatula tips that make intimate contact with the surface.
-      This visualization focuses on structure and scale rather than numerical simulation.
+    <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1.2rem;">
+      Start from a gecko foot already pressing against a wall, then zoom in to reveal the
+      structural hierarchy: macroscopic footpad, lamella ridges, dense setae, spatula pads,
+      and finally atoms interacting via van der Waals forces at the contact interface.
     </p>
     <div
       id="setae-model-container"
@@ -34,6 +34,7 @@
         padding: 12px;
       "
     >
+      <!-- Dedicated visualization container (all content is created inside this div) -->
       <div
         id="gecko-zoom-model"
         style="width: 100%; height: 100%;"
@@ -42,7 +43,7 @@
   `;
 </script>
 
-<!-- New zoom-based visualization script -->
+<!-- New zoom-based visualization (place this script file in js/) -->
 <script src="js/gecko-zoom-visualization.js"></script>
 </body>
 </html>
