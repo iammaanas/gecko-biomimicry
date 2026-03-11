@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Setae Model</title>
+  <title>Gecko Foot Hierarchical Zoom</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,11 +17,11 @@
   }
 
   pageContent.innerHTML = `
-    <h1>Gecko Foot Hierarchical Zoom Model</h1>
-    <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1.2rem;">
-      Start from a gecko foot already pressing against a wall, then zoom in to reveal the
-      structural hierarchy: macroscopic footpad, lamella ridges, dense setae, spatula pads,
-      and finally atoms interacting via van der Waals forces at the contact interface.
+    <h1>Gecko Foot Hierarchical Zoom</h1>
+    <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1rem;">
+      Start at a gecko foot already sticking to a wall, then zoom smoothly through the full adhesion hierarchy:
+      side view of the footpad, lamellar ridges, microscopic setae, nanoscopic spatula pads, and finally atoms
+      interacting via van der Waals forces.
     </p>
     <div
       id="setae-model-container"
@@ -34,16 +34,15 @@
         padding: 12px;
       "
     >
-      <!-- Dedicated visualization container (all content is created inside this div) -->
       <div
         id="gecko-zoom-model"
-        style="width: 100%; height: 100%;"
+        style="width: 100%; height: 100%; position: relative;"
       ></div>
     </div>
   `;
 </script>
 
-<!-- New zoom-based visualization (place this script file in js/) -->
+<!-- New hierarchical zoom visualization (no global CSS, all inline) -->
 <script src="js/gecko-zoom-visualization.js"></script>
 </body>
 </html>
