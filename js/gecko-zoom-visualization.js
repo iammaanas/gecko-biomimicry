@@ -1,7 +1,7 @@
 (() => {
   const CONTAINER_ID = "gecko-zoom-model";
 
-  // ---- Utility helpers -----------------------------------------------------
+  // ---- Utilities -----------------------------------------------------------
 
   function clamp(v, min, max) {
     return Math.min(max, Math.max(min, v));
@@ -11,30 +11,31 @@
     return a + (b - a) * t;
   }
 
-  function smoothstep(edge0, edge1, x) {
-    const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+  function smoothstep(e0, e1, x) {
+    const t = clamp((x - e0) / (e1 - e0), 0, 1);
     return t * t * (3 - 2 * t);
   }
 
-  // ---- Model setup ---------------------------------------------------------
+  // ---- Main class ----------------------------------------------------------
 
-  class GeckoZoomVisualization {
+  class GeckoHierarchicalZoom {
     constructor(container) {
       this.container = container;
 
-      // Zoom state
+      // Zoom and camera state
       this.minZoom = 1.0;
-      this.maxZoom = 8.0;
-      this.zoom = 1.0;        // rendered zoom (smoothed)
-      this.targetZoom = 1.0;  // user intent
+      this.maxZoom = 9.0;
+      this.zoom = 1.0;
+      this.targetZoom = 1.0;
 
-      // For subtle parallax / motion
       this.time = 0;
 
-      // Precomputed structure data
-      this.lamellae = [];
+      // Structural data
+      this.lamellaBands = [];
+      this.microLamella = [];
       this.setae = [];
-      this.spatulae = [];
+      this.spatulaClusters = [];
+      this.atoms = [];
 
       this._buildDom();
       this._generateStructures();
@@ -44,9 +45,8 @@
       requestAnimationFrame((t) => this._frame(t));
     }
 
-    // Create canvas, overlay label, and controls INSIDE the container
+    // Canvas, labels, controls (all scoped to container)
     _buildDom() {
-      // Style container without touching global CSS
       this.container.style.position = this.container.style.position || "relative";
       this.container.style.overflow = "hidden";
       this.container.style.minHeight = this.container.style.minHeight || "420px";
@@ -56,7 +56,7 @@
       this.canvas.style.display = "block";
       this.canvas.style.width = "100%";
       this.canvas.style.height = "100%";
-      this.canvas.style.touchAction = "none"; // allow wheel / pinch
+      this.canvas.style.touchAction = "none";
       this.container.appendChild(this.canvas);
       this.ctx = this.canvas.getContext("2d");
 
@@ -65,7 +65,7 @@
       this.label.style.position = "absolute";
       this.label.style.left = "16px";
       this.label.style.top = "16px";
-      this.label.style.padding = "6px 10px";
+      this.label.style.padding = "6px 12px";
       this.label.style.borderRadius = "999px";
       this.label.style.background = "rgba(0,0,0,0.6)";
       this.label.style.color = "#f5f7fb";
@@ -73,7 +73,6 @@
       this.label.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       this.label.style.pointerEvents = "none";
       this.label.style.transition = "opacity 0.25s ease";
-      this.label.style.opacity = "1";
       this.container.appendChild(this.label);
 
       // Zoom controls (bottom-right)
@@ -87,163 +86,183 @@
       this.controls.style.background = "rgba(0,0,0,0.55)";
       this.controls.style.borderRadius = "999px";
       this.controls.style.padding = "4px";
-      this.controls.style.border = "1px solid rgba(255,255,255,0.15)";
+      this.controls.style.border = "1px solid rgba(255,255,255,0.18)";
 
-      const mkBtn = (label) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = label;
-        btn.style.border = "none";
-        btn.style.outline = "none";
-        btn.style.width = "28px";
-        btn.style.height = "28px";
-        btn.style.borderRadius = "999px";
-        btn.style.cursor = "pointer";
-        btn.style.background = "rgba(15,23,42,0.9)";
-        btn.style.color = "#e5edf9";
-        btn.style.fontSize = "0.9rem";
-        btn.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-        btn.style.display = "flex";
-        btn.style.alignItems = "center";
-        btn.style.justifyContent = "center";
-        btn.style.padding = "0";
-        btn.onmouseenter = () => {
-          btn.style.background = "rgba(30,64,175,0.95)";
+      const mkBtn = (text) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = text;
+        b.style.border = "none";
+        b.style.outline = "none";
+        b.style.width = "28px";
+        b.style.height = "28px";
+        b.style.borderRadius = "999px";
+        b.style.cursor = "pointer";
+        b.style.background = "rgba(15,23,42,0.92)";
+        b.style.color = "#e5edf9";
+        b.style.fontSize = "0.9rem";
+        b.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        b.style.display = "flex";
+        b.style.alignItems = "center";
+        b.style.justifyContent = "center";
+        b.onmouseenter = () => {
+          b.style.background = "rgba(37,99,235,0.95)";
         };
-        btn.onmouseleave = () => {
-          btn.style.background = "rgba(15,23,42,0.9)";
+        b.onmouseleave = () => {
+          b.style.background = "rgba(15,23,42,0.92)";
         };
-        return btn;
+        return b;
       };
 
-      this.btnZoomOut = mkBtn("−");
-      this.btnZoomIn = mkBtn("+");
+      this.btnOut = mkBtn("−");
+      this.btnIn = mkBtn("+");
       this.btnReset = mkBtn("⟳");
       this.btnReset.style.width = "32px";
 
-      this.controls.appendChild(this.btnZoomOut);
-      this.controls.appendChild(this.btnZoomIn);
+      this.controls.appendChild(this.btnOut);
+      this.controls.appendChild(this.btnIn);
       this.controls.appendChild(this.btnReset);
       this.container.appendChild(this.controls);
     }
 
-    // Generate representative lamellae, setae, and spatula clusters
+    // Generate representative geometry in normalized space
     _generateStructures() {
-      // Normalized coordinate system: x in [0,1], y in [0,1], later mapped to canvas
+      // Coordinate conventions (side view):
+      // - x in [0,1], left to right
+      // - y in [0,1], top to bottom
+      // - Vertical wall at x ≈ 0.75
+      const wallX = 0.75;
 
-      // Lamellae: stripes under the footpad area
-      const lamellaCount = 14;
-      for (let i = 0; i < lamellaCount; i++) {
-        const t = i / (lamellaCount - 1);
-        this.lamellae.push({
-          y: 0.55 + (t - 0.5) * 0.25, // band vertical placement
-          thickness: 0.02,
-          curve: (Math.random() - 0.5) * 0.08
+      // Macroscopic lamella bands under footpad (side view strips)
+      const bandCount = 10;
+      for (let i = 0; i < bandCount; i++) {
+        const t = i / (bandCount - 1);
+        this.lamellaBands.push({
+          // Each band emerges from foot towards wall
+          x0: lerp(0.4, wallX - 0.02, 0.4 + 0.4 * Math.random()),
+          x1: wallX - 0.01,
+          y: 0.45 + (t - 0.5) * 0.32,
+          thickness: 0.02 + Math.random() * 0.01,
+          curvature: (Math.random() - 0.5) * 0.06
         });
       }
 
-      // Setae: anchor along lamellae, but we only represent a subset
-      const setaeCount = 260; // within 200–400 guideline
+      // Inside a single band: “micro-lamella” plates (zoomed ridge interior)
+      const plateCount = 40;
+      for (let i = 0; i < plateCount; i++) {
+        const t = i / plateCount;
+        this.microLamella.push({
+          localX: 0.52 + t * 0.18,   // narrow region inside a band
+          localY: 0.54 + (Math.random() - 0.5) * 0.06,
+          height: 0.015 + Math.random() * 0.01
+        });
+      }
+
+      // Setae anchored along micro-lamella region, pointing to wall
+      const setaeCount = 260;
       for (let i = 0; i < setaeCount; i++) {
-        const lam = this.lamellae[i % lamellaCount];
-        const baseX = 0.3 + Math.random() * 0.25;
-        const baseY = lam.y + (Math.random() - 0.5) * 0.02;
-        const length = 0.18 + Math.random() * 0.1;
-        const angle = (-Math.PI / 2) + (Math.random() - 0.5) * 0.4; // generally downward
+        const lam = this.microLamella[i % this.microLamella.length];
+        const baseX = lam.localX + (Math.random() - 0.5) * 0.01;
+        const baseY = lam.localY + (Math.random() - 0.5) * lam.height;
+        const length = 0.12 + Math.random() * 0.06;
+        const angle = (Math.random() * 0.25 - 0.125); // around horizontal to the right
         this.setae.push({
           baseX,
           baseY,
           length,
           angle,
-          waviness: 0.1 + Math.random() * 0.2
+          waviness: 0.1 + Math.random() * 0.25
         });
       }
 
-      // Spatula clusters: a few per seta, but represented as groups at the ends
-      const spatulaPerSeta = 4;
+      // Spatula clusters along each seta near the wall
+      const spatPerSeta = 4;
       for (let i = 0; i < this.setae.length; i++) {
-        const s = this.setae[i];
         const clusters = [];
-        for (let j = 0; j < spatulaPerSeta; j++) {
-          const offset = 0.7 + (j / spatulaPerSeta) * 0.3;
-          clusters.push({
-            along: offset
+        for (let j = 0; j < spatPerSeta; j++) {
+          clusters.push({ along: 0.55 + (j / spatPerSeta) * 0.45 });
+        }
+        this.spatulaClusters.push(clusters);
+      }
+
+      // Atom layer: two opposing rows (wall atoms & spatula atoms)
+      const atomCols = 22;
+      const atomRows = 3;
+      const baseY = 0.55;
+      for (let row = 0; row < atomRows; row++) {
+        for (let col = 0; col < atomCols; col++) {
+          const t = col / (atomCols - 1);
+          const x = lerp(wallX - 0.07, wallX - 0.01, t);
+          const jitterY = (Math.random() - 0.5) * 0.01;
+          const upper = row === 0;
+          this.atoms.push({
+            x,
+            y: baseY + jitterY + (upper ? -0.01 : 0.01) + row * 0.01,
+            upper
           });
         }
-        this.spatulae.push(clusters);
       }
     }
 
-    // ---- Events -------------------------------------------------------------
-
+    // Events: wheel zoom, buttons, resize
     _bindEvents() {
-      // Wheel / trackpad zoom
       this.container.addEventListener(
         "wheel",
         (e) => {
           e.preventDefault();
-          const delta = e.deltaY;
-          const zoomFactor = Math.exp(-delta * 0.0015); // smooth
+          const zoomFactor = Math.exp(-e.deltaY * 0.0015);
           this.targetZoom = clamp(this.targetZoom * zoomFactor, this.minZoom, this.maxZoom);
         },
         { passive: false }
       );
 
-      // Zoom buttons
-      this.btnZoomIn.addEventListener("click", () => {
-        this.targetZoom = clamp(this.targetZoom * 1.3, this.minZoom, this.maxZoom);
+      this.btnIn.addEventListener("click", () => {
+        this.targetZoom = clamp(this.targetZoom * 1.35, this.minZoom, this.maxZoom);
       });
-      this.btnZoomOut.addEventListener("click", () => {
-        this.targetZoom = clamp(this.targetZoom / 1.3, this.minZoom, this.maxZoom);
+
+      this.btnOut.addEventListener("click", () => {
+        this.targetZoom = clamp(this.targetZoom / 1.35, this.minZoom, this.maxZoom);
       });
+
       this.btnReset.addEventListener("click", () => {
         this.targetZoom = 1.0;
       });
 
-      // Resize
       window.addEventListener("resize", () => this._resizeCanvas());
     }
 
     _resizeCanvas() {
       const rect = this.container.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      const width = Math.max(1, Math.round(rect.width * dpr));
-      const height = Math.max(1, Math.round(rect.height * dpr));
-
-      this.canvas.width = width;
-      this.canvas.height = height;
+      const w = Math.max(1, Math.round(rect.width * dpr));
+      const h = Math.max(1, Math.round(rect.height * dpr));
+      this.canvas.width = w;
+      this.canvas.height = h;
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    // ---- Label based on zoom level -----------------------------------------
-
     _updateLabel() {
       const z = this.zoom;
-      let text;
-      if (z < 1.5) {
-        text = "Gecko Foot (macroscopic view)";
-      } else if (z < 3) {
-        text = "Lamellae Ridges (footpad microstructure)";
-      } else if (z < 6) {
-        text = "Microscopic Setae (hair-like fibers)";
+      let txt;
+      if (z < 1.6) {
+        txt = "Gecko foot pressing on wall (side view)";
+      } else if (z < 3.0) {
+        txt = "Footpad lamella ridges contacting the wall";
+      } else if (z < 5.0) {
+        txt = "Deeper into one ridge: dense lamella micro-plates and setae bases";
+      } else if (z < 7.0) {
+        txt = "Zoom into a single seta: spatula pads at the wall";
       } else {
-        text = "Nanoscopic Spatula Tips (van der Waals contact)";
+        txt = "Atoms from spatula and wall with van der Waals interactions";
       }
-      this.label.textContent = text;
+      this.label.textContent = txt;
     }
 
-    // ---- Main animation frame ----------------------------------------------
-
-    _frame(timestamp) {
-      const dt = 0.016; // stable for simplicity
-      this.time += dt;
-
-      // Smooth zoom toward target
-      const smoothing = 0.12;
-      this.zoom = lerp(this.zoom, this.targetZoom, smoothing);
-
+    _frame() {
+      this.time += 0.016;
+      this.zoom = lerp(this.zoom, this.targetZoom, 0.14);
       this._render();
-      requestAnimationFrame((t) => this._frame(t));
+      requestAnimationFrame(() => this._frame());
     }
 
     // ---- Rendering ----------------------------------------------------------
@@ -258,245 +277,273 @@
 
       ctx.clearRect(0, 0, width, height);
 
-      // Background gradient
+      // Background
       const bg = ctx.createLinearGradient(0, 0, 0, height);
       bg.addColorStop(0, "#020617");
-      bg.addColorStop(1, "#020b14");
+      bg.addColorStop(1, "#020b16");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, width, height);
 
-      // Subtle surface grid for context
       this._drawBackgroundGrid(width, height);
 
-      // Normalized → screen mapping
-      const scaleBase = height * 0.9;
-      const zoomScale = scaleBase * this.zoom;
-      const originX = width * 0.5;
-      const originY = height * 0.35;
+      // Camera: we progressively zoom and slide toward the contact interface
+      const baseScale = height * 0.8;
+      const zoomScale = baseScale * this.zoom;
 
-      // Establish a transform so that (0,0)-(1,1) maps to a zoomed region
+      const focusT = smoothstep(2.0, 8.5, this.zoom);
+      const focusX = lerp(0.45, 0.75, focusT); // move focus toward wall
+      const focusY = lerp(0.5, 0.55, focusT);
+
       ctx.save();
-      ctx.translate(originX, originY);
+      ctx.translate(width * 0.5, height * 0.5);
       ctx.scale(zoomScale, zoomScale);
-      ctx.translate(-0.5, -0.5); // center around (0.5,0.5)
+      ctx.translate(-focusX, -focusY);
 
-      // Draw wall surface (y ~0.65-0.7 in normalized coords)
-      this._drawSurface();
+      // Wall
+      const wallX = 0.75;
+      this._drawWall(wallX);
 
-      // Determine visibility weights for each level using smooth transitions
+      // Level weights (smooth transitions)
       const z = this.zoom;
 
-      const footAlpha = 1 - smoothstep(1.3, 2.0, z);
-      const lamellaAlpha = smoothstep(1.2, 2.0, z) * (1 - smoothstep(3.0, 4.0, z));
-      const setaeAlpha = smoothstep(2.5, 3.5, z) * (1 - smoothstep(5.2, 6.0, z));
-      const spatulaAlpha = smoothstep(5.0, 6.2, z);
+      const footAlpha = 1 - smoothstep(1.2, 2.0, z);
+      const lamellaBandAlpha = smoothstep(1.3, 2.2, z) * (1 - smoothstep(3.0, 3.8, z));
+      const microLamellaAlpha = smoothstep(2.5, 3.4, z) * (1 - smoothstep(4.6, 5.4, z));
+      const setaeAlpha = smoothstep(3.4, 4.4, z) * (1 - smoothstep(6.2, 7.0, z));
+      const spatulaAlpha = smoothstep(5.0, 6.2, z) * (1 - smoothstep(7.0, 7.6, z));
+      const atomAlpha = smoothstep(6.4, 7.6, z);
 
-      // Draw in hierarchical order
-      if (footAlpha > 0.01) this._drawFootSilhouette(footAlpha);
-      if (lamellaAlpha > 0.01) this._drawLamellae(lamellaAlpha);
-      if (setaeAlpha > 0.01) this._drawSetae(setaeAlpha);
-      if (spatulaAlpha > 0.01) this._drawSpatulae(spatulaAlpha);
+      if (footAlpha > 0.01) this._drawFoot(footAlpha, wallX);
+      if (lamellaBandAlpha > 0.01) this._drawLamellaBands(lamellaBandAlpha, wallX);
+      if (microLamellaAlpha > 0.01) this._drawMicroLamella(microLamellaAlpha);
+      if (setaeAlpha > 0.01) this._drawSetae(setaeAlpha, wallX);
+      if (spatulaAlpha > 0.01) this._drawSpatulae(spatulaAlpha, wallX);
+      if (atomAlpha > 0.01) this._drawAtoms(atomAlpha, wallX);
 
       ctx.restore();
-
       this._updateLabel();
     }
 
-    _drawBackgroundGrid(width, height) {
+    _drawBackgroundGrid(w, h) {
       const ctx = this.ctx;
       ctx.save();
       ctx.strokeStyle = "rgba(148,163,184,0.06)";
       ctx.lineWidth = 1;
       const step = 32;
-      for (let x = 0; x < width; x += step) {
+      for (let x = 0; x < w; x += step) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
+        ctx.lineTo(x, h);
         ctx.stroke();
       }
-      for (let y = 0; y < height; y += step) {
+      for (let y = 0; y < h; y += step) {
         ctx.beginPath();
         ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
+        ctx.lineTo(w, y);
         ctx.stroke();
       }
       ctx.restore();
     }
 
-    _drawSurface() {
+    _drawWall(wallX) {
       const ctx = this.ctx;
       ctx.save();
 
-      const y0 = 0.65;
-      const y1 = 0.8;
-
-      // Slightly textured plane
+      // Wall body
       ctx.fillStyle = "#111827";
-      ctx.fillRect(-0.5, y0, 2.0, y1 - y0);
+      ctx.fillRect(wallX, 0.25, 0.35, 0.6);
 
-      // Top highlight
-      ctx.fillStyle = "rgba(148,163,184,0.65)";
-      ctx.fillRect(-0.5, y0 - 0.003, 2.0, 0.003);
-
-      // Micro-texture noise lines
-      ctx.strokeStyle = "rgba(148,163,184,0.18)";
-      ctx.lineWidth = 0.0015;
-      for (let i = 0; i < 40; i++) {
-        const x0 = -0.4 + Math.random() * 1.8;
-        const x1 = x0 + 0.18 + Math.random() * 0.2;
-        const y = y0 + 0.01 + (i / 60) * 0.06;
-        ctx.beginPath();
-        ctx.moveTo(x0, y);
-        ctx.lineTo(x1, y);
-        ctx.stroke();
-      }
-
-      ctx.restore();
-    }
-
-    _drawFootSilhouette(alpha) {
-      const ctx = this.ctx;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-
-      // Simple footpad + part of leg as shapes
-      ctx.fillStyle = "#0f172a";
-
-      // Leg segment
-      ctx.beginPath();
-      ctx.ellipse(0.3, 0.1, 0.22, 0.35, -0.2, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Footpad
-      ctx.beginPath();
-      ctx.ellipse(0.42, 0.45, 0.35, 0.22, -0.25, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Soft outline
-      ctx.strokeStyle = "rgba(148,163,184,0.45)";
+      // Edge
+      ctx.strokeStyle = "rgba(148,163,184,0.8)";
       ctx.lineWidth = 0.01;
+      ctx.beginPath();
+      ctx.moveTo(wallX, 0.25);
+      ctx.lineTo(wallX, 0.85);
       ctx.stroke();
 
-      // Contact glow
-      const grad = ctx.createRadialGradient(0.45, 0.6, 0.05, 0.45, 0.68, 0.35);
-      grad.addColorStop(0, "rgba(250,204,21,0.35)");
-      grad.addColorStop(1, "rgba(15,23,42,0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0.1, 0.5, 0.8, 0.4);
+      // Micro roughness
+      ctx.strokeStyle = "rgba(148,163,184,0.22)";
+      ctx.lineWidth = 0.003;
+      for (let i = 0; i < 40; i++) {
+        const y = 0.3 + (i / 40) * 0.45;
+        const dx = (Math.random() - 0.5) * 0.01;
+        ctx.beginPath();
+        ctx.moveTo(wallX + dx, y);
+        ctx.lineTo(wallX + dx + 0.02, y);
+        ctx.stroke();
+      }
+
+      // Label
+      ctx.fillStyle = "rgba(148,163,184,0.8)";
+      ctx.font = "0.04px 'Segoe UI', system-ui";
+      ctx.fillText("Wall surface", wallX + 0.02, 0.3);
 
       ctx.restore();
     }
 
-    _drawLamellae(alpha) {
+    _drawFoot(alpha, wallX) {
       const ctx = this.ctx;
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.lineWidth = 0.01;
 
-      this.lamellae.forEach((lam, idx) => {
-        const baseY = lam.y;
-        const curve = lam.curve;
-        const xStart = 0.24;
-        const xEnd = 0.65;
+      // Leg cylinder
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath();
+      ctx.ellipse(0.45, 0.35, 0.12, 0.26, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Footpad shape pressing onto wall (slightly flattened at wall)
+      ctx.beginPath();
+      ctx.ellipse(0.6, 0.55, 0.22, 0.16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Contact glow near wall
+      const grad = ctx.createRadialGradient(wallX - 0.03, 0.55, 0.02, wallX - 0.03, 0.55, 0.18);
+      grad.addColorStop(0, "rgba(250,204,21,0.45)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0.4, 0.38, 0.4, 0.34);
+
+      ctx.restore();
+    }
+
+    _drawLamellaBands(alpha, wallX) {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      this.lamellaBands.forEach((band, idx) => {
+        const y = band.y;
+        const t = (idx / this.lamellaBands.length);
+        const offset = Math.sin(this.time * 0.4 + t * Math.PI) * band.curvature;
+        const x0 = band.x0;
+        const x1 = band.x1;
 
         ctx.beginPath();
-        for (let i = 0; i <= 20; i++) {
-          const t = i / 20;
-          const x = lerp(xStart, xEnd, t);
-          const wave = Math.sin(t * Math.PI) * curve;
-          const y = baseY + wave;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
+        ctx.moveTo(x0, y + offset);
+        ctx.lineTo(x1, y + offset);
+        ctx.lineTo(x1, y + band.thickness + offset);
+        ctx.lineTo(x0, y + band.thickness + offset);
+        ctx.closePath();
 
-        const isHighlight = idx % 2 === 0;
-        ctx.strokeStyle = isHighlight
-          ? "rgba(148,163,184,0.95)"
-          : "rgba(148,163,184,0.45)";
+        ctx.fillStyle = idx % 2 === 0
+          ? "rgba(148,163,184,0.85)"
+          : "rgba(100,116,139,0.85)";
+        ctx.fill();
+      });
+
+      // Label near lamella region
+      ctx.fillStyle = "rgba(226,232,240,0.9)";
+      ctx.font = "0.035px 'Segoe UI', system-ui";
+      ctx.fillText("Lamella ridges", wallX - 0.25, 0.38);
+
+      ctx.restore();
+    }
+
+    _drawMicroLamella(alpha) {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      this.microLamella.forEach((p, i) => {
+        const phase = (i / this.microLamella.length) * Math.PI * 2;
+        const wobble = Math.sin(this.time * 0.8 + phase) * 0.003;
+        const x = p.localX + wobble;
+        const y0 = p.localY - p.height;
+        const y1 = p.localY + p.height;
+
+        ctx.strokeStyle = "rgba(148,163,184,0.6)";
+        ctx.lineWidth = 0.004;
+        ctx.beginPath();
+        ctx.moveTo(x, y0);
+        ctx.lineTo(x, y1);
         ctx.stroke();
       });
 
       ctx.restore();
     }
 
-    _drawSetae(alpha) {
+    _drawSetae(alpha, wallX) {
       const ctx = this.ctx;
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      ctx.lineWidth = 0.005;
-      const time = this.time;
+      ctx.lineWidth = 0.004;
+      const t = this.time;
 
       for (let i = 0; i < this.setae.length; i++) {
         const s = this.setae[i];
-
-        // Slight wiggle based on time and position
         const phase = (i / this.setae.length) * Math.PI * 2;
-        const sway = Math.sin(time * 1.4 + phase) * 0.08 * s.waviness;
+        const sway = Math.sin(t * 1.4 + phase) * 0.12 * s.waviness;
 
         const baseX = s.baseX;
         const baseY = s.baseY;
-        const length = s.length;
         const angle = s.angle + sway;
+        const length = Math.min(s.length, wallX - baseX - 0.005);
 
         const tipX = baseX + length * Math.cos(angle);
-        const tipY = baseY + length * Math.sin(angle);
+        const tipY = baseY + length * Math.sin(angle) * 0.4;
 
-        // Two-tone for core + halo
-        ctx.strokeStyle = "rgba(148,163,184,0.75)";
+        // Main fiber
+        ctx.strokeStyle = "rgba(148,163,184,0.7)";
         ctx.beginPath();
         ctx.moveTo(baseX, baseY);
         ctx.lineTo(tipX, tipY);
         ctx.stroke();
 
-        ctx.strokeStyle = "rgba(236,252,203,0.6)";
-        ctx.lineWidth = 0.0025;
+        // Highlight core
+        ctx.strokeStyle = "rgba(226,232,240,0.7)";
+        ctx.lineWidth = 0.002;
         ctx.beginPath();
         ctx.moveTo(baseX, baseY);
         ctx.lineTo(tipX, tipY);
         ctx.stroke();
       }
 
+      // Label
+      ctx.fillStyle = "rgba(209,250,229,0.9)";
+      ctx.font = "0.032px 'Segoe UI', system-ui";
+      ctx.fillText("Setae fibers", wallX - 0.27, 0.6);
+
       ctx.restore();
     }
 
-    _drawSpatulae(alpha) {
+    _drawSpatulae(alpha, wallX) {
       const ctx = this.ctx;
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      const time = this.time;
+      const t = this.time;
 
       for (let i = 0; i < this.setae.length; i++) {
         const s = this.setae[i];
-        const clusters = this.spatulae[i];
+        const clusters = this.spatulaClusters[i];
+        const phase = (i / this.setae.length) * Math.PI * 2;
+        const sway = Math.sin(t * 1.4 + phase) * 0.12 * s.waviness;
+
+        const angle = s.angle + sway;
         const baseX = s.baseX;
         const baseY = s.baseY;
-
-        const phase = (i / this.setae.length) * Math.PI * 2;
-        const sway = Math.sin(time * 1.4 + phase) * 0.08 * s.waviness;
-        const angle = s.angle + sway;
         const len = s.length;
 
-        clusters.forEach((cl, idx) => {
-          const along = cl.along;
-          const cx = baseX + len * along * Math.cos(angle);
-          const cy = baseY + len * along * Math.sin(angle);
+        clusters.forEach((c, idx) => {
+          const along = c.along;
+          let cx = baseX + len * along * Math.cos(angle);
+          let cy = baseY + len * along * Math.sin(angle) * 0.4;
 
-          // At the wall, spatula tips flatten against the surface (y ≈ 0.65)
-          const contactY = 0.65;
-          const isAtSurface = cy > contactY - 0.02;
+          // Clamp to wall for near-tip clusters
+          const atWall = cx > wallX - 0.02;
+          if (atWall) cx = wallX - 0.004;
 
-          const tipY = isAtSurface ? contactY : cy;
-          const normalAngle = angle + Math.PI / 2;
-          const size = 0.02 + 0.01 * Math.sin(time * 2.1 + idx * 0.7);
+          const size = 0.015 + 0.007 * Math.sin(t * 2.0 + idx * 0.7);
 
-          const p0x = cx + size * 0.5 * Math.cos(normalAngle);
-          const p0y = tipY + size * 0.5 * Math.sin(normalAngle);
-          const p1x = cx - size * 0.5 * Math.cos(normalAngle);
-          const p1y = tipY - size * 0.5 * Math.sin(normalAngle);
-          const p2x = cx + size * 1.8 * Math.cos(angle);
-          const p2y = tipY + size * 1.8 * Math.sin(angle) * 0.4;
+          const normal = angle + Math.PI / 2;
+          const p0x = cx + size * 0.6 * Math.cos(normal);
+          const p0y = cy + size * 0.6 * Math.sin(normal);
+          const p1x = cx - size * 0.6 * Math.cos(normal);
+          const p1y = cy - size * 0.6 * Math.sin(normal);
+          const p2x = cx + size * 1.7 * Math.cos(angle);
+          const p2y = cy + size * 1.7 * Math.sin(angle) * 0.4;
 
           ctx.beginPath();
           ctx.moveTo(p0x, p0y);
@@ -504,24 +551,74 @@
           ctx.lineTo(p2x, p2y);
           ctx.closePath();
 
-          const baseColor = isAtSurface
-            ? "rgba(250,204,21,"
-            : "rgba(148,163,184,";
-
-          const opacity = isAtSurface ? 0.85 : 0.45;
-          ctx.fillStyle = baseColor + opacity + ")";
+          if (atWall) {
+            ctx.fillStyle = "rgba(250,204,21,0.85)";
+          } else {
+            ctx.fillStyle = "rgba(148,163,184,0.55)";
+          }
           ctx.fill();
         });
       }
 
-      // Faint contact band glow
-      const glowY = 0.65;
-      const grad = ctx.createLinearGradient(0.2, glowY - 0.02, 0.2, glowY + 0.04);
+      // Contact band glow
+      const gy = 0.55;
+      const grad = ctx.createLinearGradient(wallX - 0.08, gy - 0.03, wallX - 0.01, gy + 0.03);
       grad.addColorStop(0, "rgba(250,204,21,0.0)");
-      grad.addColorStop(0.5, "rgba(250,204,21,0.4)");
+      grad.addColorStop(0.45, "rgba(250,204,21,0.45)");
       grad.addColorStop(1, "rgba(250,204,21,0.0)");
       ctx.fillStyle = grad;
-      ctx.fillRect(0.0, glowY - 0.03, 1.2, 0.1);
+      ctx.fillRect(wallX - 0.1, gy - 0.05, 0.12, 0.12);
+
+      ctx.restore();
+    }
+
+    _drawAtoms(alpha, wallX) {
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Two clouds of atoms, slightly vibrating
+      this.atoms.forEach((a, i) => {
+        const phase = (i / this.atoms.length) * Math.PI * 2;
+        const jitterX = Math.sin(this.time * 2.4 + phase) * 0.002;
+        const jitterY = Math.cos(this.time * 2.0 + phase) * 0.002;
+
+        const x = a.x + jitterX;
+        const y = a.y + jitterY;
+
+        const r = 0.006;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fillStyle = a.upper ? "#60a5fa" : "#fbbf24";
+        ctx.fill();
+      });
+
+      // Van der Waals "bridges" between close pairs
+      ctx.strokeStyle = "rgba(129,140,248,0.6)";
+      ctx.lineWidth = 0.002;
+      for (let i = 0; i < this.atoms.length; i++) {
+        const a = this.atoms[i];
+        if (!a.upper) continue;
+        for (let j = 0; j < this.atoms.length; j++) {
+          const b = this.atoms[j];
+          if (b.upper) continue;
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 0.0003 && d2 > 0.00002) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Label
+      ctx.fillStyle = "#e5e7eb";
+      ctx.font = "0.032px 'Segoe UI', system-ui";
+      ctx.fillText("Atoms + van der Waals forces", wallX - 0.28, 0.5);
 
       ctx.restore();
     }
@@ -529,18 +626,16 @@
 
   // ---- Bootstrap -----------------------------------------------------------
 
-  function initGeckoZoomVisualization() {
+  function init() {
     const container = document.getElementById(CONTAINER_ID);
     if (!container) return;
-    // Avoid double-init
     if (container.__geckoZoomInstance) return;
-    container.__geckoZoomInstance = new GeckoZoomVisualization(container);
+    container.__geckoZoomInstance = new GeckoHierarchicalZoom(container);
   }
 
-  // Initialize when DOM is ready
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initGeckoZoomVisualization);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    initGeckoZoomVisualization();
+    init();
   }
 })();
