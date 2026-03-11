@@ -1,122 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
   <title>Setae Model</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    .main-content { padding: 0 !important; max-width: 100% !important; }
-
-    #scroll-container {
-      height: 550vh;
-      position: relative;
-      width: 100%;
-    }
-
-    #stage-canvas {
-      position: fixed;
-      top: 54px;
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - 54px);
-      z-index: 2;
-      display: block;
-    }
-
-    #stage-info {
-      position: fixed;
-      bottom: 1.8rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      text-align: center;
-      pointer-events: none;
-      width: 90vw;
-      max-width: 480px;
-    }
-
-    #stage-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #ffbd59;
-      margin-bottom: 0.25rem;
-      letter-spacing: 0.02em;
-    }
-
-    #stage-desc {
-      font-size: 0.8rem;
-      color: #9aa4af;
-      line-height: 1.5;
-    }
-
-    .stage-dots {
-      position: fixed;
-      right: 1.2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-    }
-
-    .stage-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: rgba(255,189,89,0.2);
-      border: 1px solid rgba(255,189,89,0.35);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .stage-dot.active {
-      background: #ffbd59;
-      box-shadow: 0 0 8px rgba(255,189,89,0.7);
-      transform: scale(1.4);
-    }
-
-    .progress-bar {
-      position: fixed;
-      top: 54px;
-      left: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #ffbd59, rgba(255,189,89,0.3));
-      z-index: 20;
-      transition: width 0.1s linear;
-    }
-
-    @media (max-width: 600px) {
-      .stage-dots { display: none; }
-      #stage-title { font-size: 0.9rem; }
-      #stage-desc { font-size: 0.75rem; }
-    }
-  </style>
 </head>
 <body>
+
 <script src="js/layout.js"></script>
+
 <script>
-document.getElementById("page-content").innerHTML = `
-  <div id="scroll-container"></div>
-  <canvas id="stage-canvas"></canvas>
+  const pageContent = document.getElementById("page-content");
+  const mainContent = document.querySelector(".main-content");
 
-  <div class="stage-dots">
-    <div class="stage-dot active" data-stage="0" title="Gecko Toe"></div>
-    <div class="stage-dot" data-stage="1" title="Lamellae"></div>
-    <div class="stage-dot" data-stage="2" title="Setae Field"></div>
-    <div class="stage-dot" data-stage="3" title="Spatulae"></div>
-    <div class="stage-dot" data-stage="4" title="Van der Waals"></div>
-  </div>
+  if (mainContent) {
+    mainContent.style.maxWidth = "1200px";
+    mainContent.style.paddingTop = "5rem";
+  }
 
-  <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+  pageContent.innerHTML = `
+    <h1>Interactive Gecko Setae Adhesion Model</h1>
 
-  <div id="stage-info">
-    <div id="stage-title">Gecko Toe</div>
-    <div id="stage-desc">Macro view — the toe pad resting on a surface (~1 cm)</div>
-  </div>
-`;
+    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+      This module shows a simplified cluster of gecko setae and spatulae interacting with a rigid surface.
+      Drag inside the simulation to tilt and compress the footpad, then observe how contact count and directional
+      adhesion change in real time.
+    </p>
+
+    <div id="setae-model-container" style="width: 100%; min-height: 700px; border: 1px solid rgba(255,189,89,0.18); border-radius: 16px; background: linear-gradient(145deg, #131c26, #111820); padding: 12px;"></div>
+  `;
 </script>
+
 <script src="js/setae.js"></script>
+
 </body>
 </html>
