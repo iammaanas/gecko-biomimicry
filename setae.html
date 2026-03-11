@@ -17,15 +17,32 @@
   }
 
   pageContent.innerHTML = `
-    <h1>Professional Gecko Setae Adhesion Model</h1>
+    <h1>Gecko Foot Hierarchical Zoom Model</h1>
     <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1rem;">
-      A scientific visualization module for directional dry adhesion. The model simulates a representative
-      cluster of setae fibers with nanoscale spatula tips, then computes real-time adhesion from contact area,
-      directional alignment, and interface quality.
+      Explore how gecko feet stick to walls by zooming from a full footpad view down through lamellae,
+      microscopic setae, and finally nanoscopic spatula tips that make intimate contact with the surface.
+      This visualization focuses on structure and scale rather than numerical simulation.
     </p>
-    <div id="setae-model-container" style="width:100%; min-height:740px; border:1px solid rgba(255,189,89,0.18); border-radius:16px; background:linear-gradient(145deg,#131c26,#111820); padding:12px;"></div>
+    <div
+      id="setae-model-container"
+      style="
+        width: 100%;
+        min-height: 740px;
+        border: 1px solid rgba(255,189,89,0.18);
+        border-radius: 16px;
+        background: linear-gradient(145deg,#131c26,#111820);
+        padding: 12px;
+      "
+    >
+      <div
+        id="gecko-zoom-model"
+        style="width: 100%; height: 100%;"
+      ></div>
+    </div>
   `;
 </script>
-<script src="js/setae.js"></script>
+
+<!-- New zoom-based visualization script -->
+<script src="js/gecko-zoom-visualization.js"></script>
 </body>
 </html>
