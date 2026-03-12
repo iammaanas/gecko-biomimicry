@@ -1,48 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gecko Foot Hierarchical Zoom</title>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Setae Model — Gecko Lab</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <script src="js/layout.js"></script>
 <script>
-  const pageContent = document.getElementById("page-content");
-  const mainContent = document.querySelector(".main-content");
+document.getElementById("page-content").innerHTML = `
+<div class="page-hero">
+  <div class="ph-top">
+    <span class="tag tag-teal">02 / Biology</span>
+    <span class="tag tag-blue">Hierarchical Structure</span>
+  </div>
+  <h1>Setae <em>Anatomy</em></h1>
+  <p style="max-width:580px">
+    A gecko's adhesion emerges from a four-level hierarchical structure — each level
+    invisible to the previous one, each multiplying the contact surface area until
+    van der Waals forces become macroscopically significant.
+  </p>
+</div>
 
-  if (mainContent) {
-    mainContent.style.maxWidth = "1240px";
-    mainContent.style.paddingTop = "5rem";
-  }
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;margin-bottom:2rem" class="reveal">
 
-  pageContent.innerHTML = `
-    <h1>Gecko Foot Hierarchical Zoom</h1>
-    <p style="color: var(--text-muted); line-height: 1.65; margin-bottom: 1rem;">
-      Start at a gecko foot already sticking to a wall, then zoom smoothly through the full adhesion hierarchy:
-      side view of the footpad, lamellar ridges, microscopic setae, nanoscopic spatula pads, and finally atoms
-      interacting via van der Waals forces.
-    </p>
-    <div
-      id="setae-model-container"
-      style="
-        width: 100%;
-        min-height: 740px;
-        border: 1px solid rgba(255,189,89,0.18);
-        border-radius: 16px;
-        background: linear-gradient(145deg,#131c26,#111820);
-        padding: 12px;
-      "
-    >
-      <div
-        id="gecko-zoom-model"
-        style="width: 100%; height: 100%; position: relative;"
-      ></div>
+  <div class="card" style="border-color:rgba(0,240,160,.18)">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,240,160,.1);border:1px solid rgba(0,240,160,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.7rem;color:var(--teal);font-weight:700;flex-shrink:0">01</div>
+      <div>
+        <div style="font-family:var(--fm);font-size:.74rem;font-weight:700;color:var(--t1);letter-spacing:.04em">Toe Pad</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--t3)">~1–2 cm scale</div>
+      </div>
     </div>
-  `;
-</script>
+    <p style="font-size:.86rem">The macroscopic toe pad — visible to the naked eye. Consists of overlapping flap-like ridges called lamellae arranged in parallel rows perpendicular to the direction of travel. The entire pad is ~200 mm² per foot in a typical tokay gecko (<em>Gekko gecko</em>).</p>
+  </div>
 
-<!-- New hierarchical zoom visualization (no global CSS, all inline) -->
-<script src="js/gecko-zoom-visualization.js"></script>
+  <div class="card reveal-delay-1" style="border-color:rgba(0,240,160,.18)">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,240,160,.1);border:1px solid rgba(0,240,160,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.7rem;color:var(--teal);font-weight:700;flex-shrink:0">02</div>
+      <div>
+        <div style="font-family:var(--fm);font-size:.74rem;font-weight:700;color:var(--t1);letter-spacing:.04em">Lamellae</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--t3)">100–500 μm scale</div>
+      </div>
+    </div>
+    <p style="font-size:.86rem">Parallel ridges running across the underside of the toe pad, spaced ~100–500 μm apart. Each lamella is a plate-like projection of skin from which the setae emerge. The lamellar structure ensures the toe pad can conform to curved or irregular surfaces at the mesoscale.</p>
+  </div>
+
+  <div class="card" style="border-color:rgba(42,180,255,.18)">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(42,180,255,.1);border:1px solid rgba(42,180,255,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.7rem;color:var(--blue);font-weight:700;flex-shrink:0">03</div>
+      <div>
+        <div style="font-family:var(--fm);font-size:.74rem;font-weight:700;color:var(--t1);letter-spacing:.04em">Setae</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--t3)">~100 μm tall, ~5 μm wide</div>
+      </div>
+    </div>
+    <p style="font-size:.86rem">Microscopic hair-like fibres made of β-keratin — the same protein as bird feathers. Each seta is roughly 100 μm long and 5 μm in diameter. A single gecko foot contains approximately <strong style="color:var(--t1)">500,000 setae</strong> (Autumn et al. 2000). Each seta produces up to <strong style="color:var(--t1)">194 μN shear force</strong> — the first measurement of which (2000) proved van der Waals as the mechanism.</p>
+  </div>
+
+  <div class="card reveal-delay-1" style="border-color:rgba(42,180,255,.18)">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem">
+      <div style="width:36px;height:36px;border-radius:8px;background:rgba(42,180,255,.1);border:1px solid rgba(42,180,255,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.7rem;color:var(--blue);font-weight:700;flex-shrink:0">04</div>
+      <div>
+        <div style="font-family:var(--fm);font-size:.74rem;font-weight:700;color:var(--t1);letter-spacing:.04em">Spatulae</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--t3)">~200 nm tips</div>
+      </div>
+    </div>
+    <p style="font-size:.86rem">Each seta branches at its tip into 100–1,000 nanoscale paddle-shaped ends called spatulae. Each spatula is ~200 nm wide — smaller than the wavelength of visible light. This is where adhesion actually occurs: the flattened tip maximises molecular contact area, generating ~<strong style="color:var(--t1)">10 nN</strong> per spatula via van der Waals interactions.</p>
+  </div>
+
+</div>
+
+<div class="section-rule reveal"><span>Why Hierarchy?</span></div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:2rem" class="reveal">
+
+  <div class="card" style="border-color:rgba(0,240,160,.12)">
+    <div class="ctrl-head">Contact Area Amplification</div>
+    <p style="font-size:.86rem">Each level of the hierarchy multiplies the available contact area by further subdividing the contact geometry. A smooth surface can only contact another surface at a few high-points. Setae-level branching allows the foot to conform to surface roughness at every scale simultaneously — from millimetres (lamellae) down to nanometres (spatulae).</p>
+    <div style="font-family:var(--fm);font-size:.8rem;background:rgba(0,0,0,.25);padding:.7rem;border-radius:var(--r1);color:var(--teal);margin-top:.8rem">
+      F<sub>total</sub> = N<sub>spatulae</sub> × F<sub>vdW,single</sub>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(0,240,160,.12)">
+    <div class="ctrl-head">Directional Detachment</div>
+    <p style="font-size:.86rem">Setae are angled (~45°) and adhesion is directional — they generate maximum force when loaded parallel to the surface (shear), but detach easily when the foot is hyperextended (rolled backwards). This is why geckos can run up walls without getting stuck: each step naturally loads then unloads the setae.</p>
+    <div style="font-family:var(--fm);font-size:.75rem;background:rgba(0,0,0,.25);padding:.7rem;border-radius:var(--r1);color:var(--t2);margin-top:.8rem;line-height:1.8">
+      <span style="color:var(--teal)">Attach:</span> drag parallel → setae load → adhesion<br>
+      <span style="color:var(--blue)">Detach:</span> hyperextend → peel angle → release
+    </div>
+  </div>
+
+</div>
+
+<div class="card reveal" style="border-color:rgba(0,240,160,.12);margin-bottom:3rem">
+  <div class="ctrl-head">Key Measurements — Tokay Gecko (<em>Gekko gecko</em>)</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem">
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">Total setae per foot</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">~500,000</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">Autumn et al. 2000, Nature</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">Seta dimensions</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">~100 μm × 5 μm</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">β-keratin fibres</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">Force per seta (shear)</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">194 μN measured</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">Autumn et al. 2000</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">Force per spatula</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">~10 nN</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">Autumn et al. 2002, PNAS</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">Spatula tip width</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">~200 nm</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">Arzt et al. 2003, PNAS</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:.5rem .4rem;color:var(--t2)">VdW contact gap D</td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">0.3–0.4 nm</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">Israelachvili 1992</td>
+    </tr>
+    <tr>
+      <td style="padding:.5rem .4rem;color:var(--t2)">Hamaker constant A<sub>H</sub></td>
+      <td style="padding:.5rem .4rem;color:var(--teal);font-family:var(--fm);text-align:right">~1×10⁻¹⁹ J</td>
+      <td style="padding:.5rem .4rem;color:var(--t4);font-size:.7rem">β-keratin / glass pair</td>
+    </tr>
+  </table>
+</div>
+`;
+</script>
 </body>
 </html>
